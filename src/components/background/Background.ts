@@ -42,7 +42,6 @@ const Background: GameComponent<ComponentCommonProps, PIXI.TilingSprite> = ({
         });
       }
     },
-    update: () => {},
   };
 };
 
