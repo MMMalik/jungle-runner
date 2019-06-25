@@ -1,0 +1,39 @@
+{
+  "frames": {
+    "landing0.png": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 20,
+        "h": 35
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 20,
+        "h": 35
+      },
+      "sourceSize": {
+        "w": 20,
+        "h": 35
+      }
+    }
+  },
+  "animations": {
+    "landing": [
+      "landing0.png"
+    ]
+  },
+  "meta": {
+    "app": "https://github.com/piskelapp/piskel/",
+    "version": "1.0",
+    "image": "landing.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 20,
+      "h": 35
+    }
+  }
+}
