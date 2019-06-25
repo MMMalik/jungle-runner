@@ -8,11 +8,11 @@
   "scripts": {
     "start": "webpack-dev-server",
     "build": "NODE_ENV=production webpack",
+    "gh-pages": "yarn build",
+    "test": "yarn lint",
     "lint": "tslint -p tsconfig.json"
   },
   "devDependencies": {
-    "@types/keyboardjs": "^2.4.1",
-    "@types/lodash": "^4.14.133",
     "prettier": "^1.17.0",
     "tslint": "^5.16.0",
     "tslint-config-prettier": "^1.18.0",
@@ -25,9 +25,6 @@
     "awesome-typescript-loader": "^5.2.1"
   },
   "dependencies": {
-    "pixi.js": "^5.0.4",
-    "keyboardjs": "^2.5.1",
-    "on-change": "^1.4.0",
-    "lodash": "^4.17.11"
+    "pixi.js": "^5.0.4"
   }
 }

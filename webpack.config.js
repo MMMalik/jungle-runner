@@ -26,6 +26,7 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, 'src/index.html'),
+      favicon: './favicons/favicon.ico',
     }),
     // Pixi will manage game asset loading, so we just need to copy them.
     // Webpack will not be involved in bundling.
