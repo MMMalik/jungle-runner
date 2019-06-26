@@ -29,7 +29,7 @@ describe('Background', () => {
     sprites.forEach(sprite => expect(sprite.tilePosition.x).toEqual(0));
   });
 
-  it('render correctly if character is moving left', () => {
+  it('renders correctly if character is moving left', () => {
     state.character.vX = -3;
     render({
       initProps,
@@ -42,7 +42,7 @@ describe('Background', () => {
     );
   });
 
-  it('render correctly if character is moving right', () => {
+  it('renders correctly if character is moving right', () => {
     state.character.vX = 3;
     render({
       initProps,

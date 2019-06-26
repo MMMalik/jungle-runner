@@ -48,24 +48,28 @@ export const areSameTextures = (
 /**
  * Returns current textures based on the character's state.
  *
- * @param running If character is running
+ * @param movingX If character is moving on X axis
  * @param jumping If character is jumping
  * @param onTheGround If character is on the ground
  */
 export const getCurrentTexture = (resources: typeof Resources) => (
-  running: boolean,
+  movingX: boolean,
   jumping: boolean,
   onTheGround: boolean
 ) => {
-  if (running && !jumping && onTheGround) {
-    return getTextures(resources.Running(), AnimationNames.Running);
-  } else if (jumping) {
+  if (jumping) {
     return getTextures(resources.Jumping(), AnimationNames.Jumping);
-  } else if (!onTheGround) {
-    return getTextures(resources.Landing(), AnimationNames.Landing);
-  } else {
-    return getTextures(resources.Idle(), AnimationNames.Idle);
   }
+
+  if (!onTheGround && !jumping) {
+    return getTextures(resources.Landing(), AnimationNames.Landing);
+  }
+
+  if (movingX && onTheGround) {
+    return getTextures(resources.Running(), AnimationNames.Running);
+  }
+
+  return getTextures(resources.Idle(), AnimationNames.Idle);
 };
 
 export const getInitPosition = (canvas: HTMLCanvasElement) => ({

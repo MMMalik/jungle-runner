@@ -48,7 +48,7 @@ describe('Character - render', () => {
   });
 
   describe('init', () => {
-    it('renderss correctly on the initial render', () => {
+    it('renders correctly on the initial render', () => {
       render(mockedResources)({
         initProps,
         state,
