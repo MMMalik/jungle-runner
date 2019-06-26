@@ -1,9 +1,9 @@
 import * as PIXI from 'pixi.js';
 import { Textures } from './constants';
+import initState from './state';
 import createComponent from './components/component';
 import Background from './components/background';
 import Character from './components/character';
-import initState from './state';
 import Keyboard from './components/keyboard';
 
 /**
@@ -23,7 +23,7 @@ const initPixiApp = (canvas: HTMLCanvasElement): PIXI.Application => {
 };
 
 /**
- * Promisified version of Pixi loader.
+ * Promisified Pixi loader.
  */
 const loadAssets = () => {
   return new Promise(resolve => {
@@ -36,6 +36,9 @@ const loadAssets = () => {
 
 /**
  * Get canvas element, load assets, then initialize Pixi app.
+ * Once the app is initialized, create game components.
+ * Each sprite from game component will be added to the Pixi container.
+ * Each render function will added to the shared ticker.
  */
 const init = async () => {
   const canvas = document.getElementById('game') as HTMLCanvasElement | null;
@@ -48,33 +51,41 @@ const init = async () => {
 
   const app = initPixiApp(canvas);
   const container = new PIXI.Container();
+  const state = initState();
+
   app.stage.addChild(container);
 
   const props = {
     canvas,
     container,
-    state: initState(),
   };
 
   [Background, Character, Keyboard]
-    .map(Component => createComponent(Component, props))
+    .map(Component => createComponent(Component, props, state))
     .filter(Boolean)
-    .forEach(({ element, update, render }) => {
-      if (Array.isArray(element)) {
-        element.forEach(el => {
-          container.addChild(el);
-        });
-      } else if (element) {
+    .forEach(({ element, elements, render }) => {
+      if (element) {
         container.addChild(element);
       }
-      const ticker = () => {
+
+      if (elements) {
+        elements.forEach(el => {
+          container.addChild(el);
+        });
+      }
+
+      const ticker = (delta: number) => {
         if (render) {
-          render();
-        }
-        if (update) {
-          update();
+          render({
+            initProps: props,
+            state,
+            element: element || new PIXI.Sprite(),
+            elements: elements || [],
+            delta,
+          });
         }
       };
+
       app.ticker.add(ticker);
     });
 };

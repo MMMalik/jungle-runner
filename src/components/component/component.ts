@@ -1,29 +1,39 @@
-import { GameState } from '../../state';
-
-export type Ticker = () => void;
-
-export interface GameElement<P extends PIXI.Sprite> {
-  ticker?: Ticker;
-  update?: Ticker;
-  render?: Ticker;
-  element?: P | P[];
+interface Element<E> {
+  element: E;
+  elements: E[];
 }
 
-export type GameComponent<Props, P extends PIXI.Sprite> = (
-  props: Props
-) => GameElement<P>;
+export type Render<GameState, E> = (
+  renderProps: {
+    initProps: ComponentCommonProps;
+    state: GameState;
+    delta: number;
+  } & E
+) => void;
+
+export interface GameElement<E, GameState> {
+  render?: Render<GameState, Element<E>>;
+  element?: E;
+  elements?: E[];
+}
+
+export type GameComponent<Props, E, GameState> = (
+  props: Props,
+  state: GameState
+) => GameElement<E, GameState>;
 
 export interface ComponentCommonProps {
   canvas: HTMLCanvasElement;
-  state: GameState;
   container: PIXI.Container;
 }
 
-export type CreateComponent = <Props, P extends PIXI.Sprite>(
-  Component: GameComponent<Props, P>,
-  props: Props
-) => GameElement<P>;
+export type CreateComponent = <Props, E extends PIXI.Sprite, GameState>(
+  Component: GameComponent<Props, E, GameState>,
+  props: Props,
+  state: GameState
+) => GameElement<E, GameState>;
 
-const createComponent: CreateComponent = (Component, props) => Component(props);
+const createComponent: CreateComponent = (Component, props, state) =>
+  Component(props, state);
 
 export default createComponent;

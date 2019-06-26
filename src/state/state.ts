@@ -1,14 +1,12 @@
-import { KeyCodes } from '../constants';
-
 export interface GameState {
   character: {
     vX: number;
     jumpTicks: number;
   };
   keyboard: {
-    [KeyCodes.Space]: boolean;
-    [KeyCodes.ArrowRight]: boolean;
-    [KeyCodes.ArrowLeft]: boolean;
+    Space: boolean;
+    ArrowRight: boolean;
+    ArrowLeft: boolean;
   };
 }
 
@@ -19,8 +17,8 @@ const initState = (): GameState => ({
   },
   keyboard: {
     Space: false,
-    [KeyCodes.ArrowRight]: false,
-    [KeyCodes.ArrowLeft]: false,
+    ArrowRight: false,
+    ArrowLeft: false,
   },
 });
 
