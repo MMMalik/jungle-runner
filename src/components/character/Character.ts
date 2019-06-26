@@ -16,6 +16,7 @@ const Resources = {
   Landing: () => PIXI.Loader.shared.resources[Textures.CharacterLanding],
 };
 
+// Map keys to actual animation names
 const AnimationNames = {
   Idle: 'idle',
   Running: 'run',
