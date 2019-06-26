@@ -1,7 +1,7 @@
 import * as PIXI from 'pixi.js';
 import { Textures } from '../../constants/Textures';
 import { GameComponent, ComponentCommonProps, Render } from '../component';
-import { isMovingX, GameState } from '../../state';
+import { GameState } from '../../state';
 
 // Value of `asset` corresponds to respective layer names in background.json asset.
 // Values of vX correspond to relative velocity of each layer. The further the layer is placed, the slower it seems to move.
