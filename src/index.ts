@@ -5,6 +5,8 @@ import createComponent from './components/component';
 import Background from './components/background';
 import Character from './components/character';
 import Keyboard from './components/keyboard';
+import Platform from './components/platform';
+import Collisions from './components/collisions';
 
 /**
  * Initialize Pixi application.
@@ -60,10 +62,10 @@ const init = async () => {
     container,
   };
 
-  [Background, Character, Keyboard]
+  [Background, Character, Platform, Keyboard, Collisions]
     .map(Component => createComponent(Component, props, state))
     .filter(Boolean)
-    .forEach(({ element, elements, render }) => {
+    .forEach(({ element, elements, render, debug }) => {
       if (element) {
         container.addChild(element);
       }
@@ -72,6 +74,10 @@ const init = async () => {
         elements.forEach(el => {
           container.addChild(el);
         });
+      }
+
+      if (debug) {
+        // app.ticker.add(debug(container));
       }
 
       const ticker = (delta: number) => {

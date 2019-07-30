@@ -7,6 +7,7 @@ import {
   Directions,
 } from '../../constants';
 import { runningDirection, isMovingX, isJumping, GameState } from '../../state';
+import { debugSprite } from '../../utils/debug';
 
 // Map resource name to actual Pixi loader resource.
 const Resources = {
@@ -94,29 +95,30 @@ export const render = (
   resources: typeof Resources
 ): Render<GameState, { element: PIXI.AnimatedSprite }> => ({
   element,
-  initProps,
   state,
 }) => {
-  const { canvas } = initProps;
   const { ArrowLeft, ArrowRight, Space } = state.keyboard;
-  const { jumpTicks } = state.character;
+  const { jumpTicks, collisions } = state.character;
+  const onTheGround = collisions.platformV < 0;
   const movingX = isMovingX(ArrowRight, ArrowLeft);
   const jumping = isJumping(jumpTicks);
-  const onTheGround = isOnTheGround(canvas, element);
   const direction = runningDirection(ArrowRight, ArrowLeft);
   const currentTextures = getCurrentTexture(resources)(
     movingX,
     jumping,
-    onTheGround
+    !!onTheGround
   );
 
   // If sprite is not on the ground, apply gravity.
-  if (!onTheGround) {
+  if (onTheGround) {
+    element.y += GameConst.Gravity + collisions.platformV;
+  } else {
     element.y += GameConst.Gravity;
   }
 
   // Apply vX based on direction.
-  state.character.vX = direction * CharacterConst.BaseVx;
+  state.character.vX =
+    direction * (CharacterConst.BaseVx + direction * collisions.platformH);
 
   // Apply scale in order to flip character if it is moving along x axis.
   element.scale.x = Math.abs(element.scale.x) * (direction || Directions.Right);
@@ -161,14 +163,16 @@ const Character: GameComponent<
   ComponentCommonProps,
   PIXI.AnimatedSprite,
   GameState
-> = ({ canvas }) => {
+> = ({ canvas }, state) => {
   const sprite = new PIXI.AnimatedSprite(
     getTextures(Resources.Idle(), AnimationNames.Idle)
   );
   initCharacterSprite(canvas, sprite);
+  state.sprites.character = sprite;
 
   return {
     element: sprite,
+    debug: debugSprite([sprite]),
     render: render(Resources),
   };
 };

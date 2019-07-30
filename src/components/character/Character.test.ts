@@ -56,13 +56,14 @@ describe('Character - render', () => {
         element: sprite,
       });
       expect(sprite.x).toEqual(initPos.x);
-      expect(sprite.y).toEqual(initPos.y);
+      expect(sprite.y).toEqual(initPos.y + GameConst.Gravity);
     });
   });
 
   describe('run', () => {
     it('renders correctly if arrow left is pressed', () => {
       state.keyboard.ArrowLeft = true;
+      state.character.collisions.platformV = -4;
       render(mockedResources)({
         initProps,
         state,
@@ -80,6 +81,7 @@ describe('Character - render', () => {
 
     it('renders correctly if arrow right is pressed', () => {
       state.keyboard.ArrowRight = true;
+      state.character.collisions.platformV = -4;
       render(mockedResources)({
         initProps,
         state,
@@ -99,6 +101,7 @@ describe('Character - render', () => {
   describe('jump', () => {
     it('renders correctly if space is pressed', () => {
       state.keyboard.Space = true;
+      state.character.collisions.platformV = -4;
       render(mockedResources)({
         initProps,
         state,
@@ -111,6 +114,8 @@ describe('Character - render', () => {
       expect(sprite.playing).toBe(true);
       expect(sprite.textures[0].baseTexture.cacheId).toEqual('idle');
 
+      state.character.collisions.platformV = 0;
+
       Array.from({ length: CharacterConst.MaxJumpTicks }).map((_, i) => {
         render(mockedResources)({
           initProps,
@@ -121,8 +126,7 @@ describe('Character - render', () => {
         expect(sprite.x).toEqual(initPos.x);
         expect(sprite.y).toEqual(
           initPos.y -
-            (i + 1) * CharacterConst.BaseJumpHeight +
-            i * GameConst.Gravity
+            (i + 1) * (CharacterConst.BaseJumpHeight - GameConst.Gravity)
         );
         expect(state.character.jumpTicks).toEqual(i + 2);
         expect(sprite.playing).toBe(true);
@@ -141,6 +145,79 @@ describe('Character - render', () => {
       expect(sprite.playing).toBe(true);
       expect(sprite.y).toEqual(GameConst.Gravity);
       expect(sprite.textures[0].baseTexture.cacheId).toEqual('landing');
+    });
+  });
+
+  describe.skip('collisions', () => {
+    it('ignores gravity if collides bottom with platform', () => {
+      state.character.collisions.platformV = -4;
+      render(mockedResources)({
+        initProps,
+        state,
+        delta: 1,
+        element: sprite,
+      });
+      expect(sprite.x).toEqual(initPos.x);
+      expect(sprite.y).toEqual(initPos.y);
+    });
+
+    it('respects collision with platform - right', () => {
+      state.character.collisions.platformV = -4;
+      state.character.collisions.platformH = -2;
+      state.keyboard.ArrowRight = true;
+      render(mockedResources)({
+        initProps,
+        state,
+        delta: 1,
+        element: sprite,
+      });
+      expect(state.character.vX).toEqual(0);
+      expect(sprite.y).toEqual(initPos.y);
+    });
+
+    it('respects collision with platform - right - let run left regardless', () => {
+      state.character.collisions.platformV = -4;
+      state.character.collisions.platformH = -2;
+      state.keyboard.ArrowLeft = true;
+
+      render(mockedResources)({
+        initProps,
+        state,
+        delta: 1,
+        element: sprite,
+      });
+      expect(state.character.vX).toEqual(CharacterConst.BaseVx * Directions.Left);
+      expect(sprite.y).toEqual(initPos.y);
+    });
+
+    it('respects collision with platform - left', () => {
+      state.character.collisions.platformV = -4;
+      state.character.collisions.platformH = 2;
+      state.keyboard.ArrowLeft = true;
+
+      render(mockedResources)({
+        initProps,
+        state,
+        delta: 1,
+        element: sprite,
+      });
+      expect(state.character.vX).toEqual(0);
+      expect(sprite.y).toEqual(initPos.y);
+    });
+
+    it('respects collision with platform - left - let run right regardless', () => {
+      state.character.collisions.platformV = -4;
+      state.character.collisions.platformH = 4;
+      state.keyboard.ArrowRight = true;
+      
+      render(mockedResources)({
+        initProps,
+        state,
+        delta: 1,
+        element: sprite,
+      });
+      expect(state.character.vX).toEqual(CharacterConst.BaseVx * Directions.Right);
+      expect(sprite.y).toEqual(initPos.y);
     });
   });
 });

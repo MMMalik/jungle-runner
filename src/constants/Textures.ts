@@ -4,4 +4,5 @@ export const Textures = {
   CharacterRunning: 'assets/character/run.json',
   CharacterJumping: 'assets/character/jump.json',
   CharacterLanding: 'assets/character/landing.json',
+  Jungle: 'assets/platform/jungle_tileset.json',
 };

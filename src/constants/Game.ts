@@ -6,5 +6,5 @@ export const Directions = {
 export const GameConst = {
   ScaleX: 1.5,
   ScaleY: 1.5,
-  Gravity: 3,
+  Gravity: 4,
 };

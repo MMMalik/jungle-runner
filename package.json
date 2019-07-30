@@ -8,10 +8,10 @@
   "scripts": {
     "start": "webpack-dev-server",
     "build": "NODE_ENV=production webpack",
-    "gh-pages": "yarn build",
+    "gh:pages": "yarn build",
     "test": "yarn lint",
     "jest": "jest",
-    "jest-watch": "jest --watch",
+    "jest:watch": "jest --watch",
     "lint": "tslint -p tsconfig.json"
   },
   "dependencies": {

@@ -12,6 +12,7 @@ export type Render<GameState, E> = (
 ) => void;
 
 export interface GameElement<E, GameState> {
+  debug?: (container: PIXI.Container) => () => void;
   render?: Render<GameState, Element<E>>;
   element?: E;
   elements?: E[];

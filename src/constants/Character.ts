@@ -1,8 +1,8 @@
 export const CharacterConst = {
   BaseVx: 2,
   AnimationSpeed: 0.2,
-  BaseJumpHeight: 6,
-  MaxJumpTicks: 25,
+  BaseJumpHeight: 10,
+  MaxJumpTicks: 13,
 };
 
 export const CharacterModes = {
