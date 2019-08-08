@@ -1,5 +1,6 @@
 import * as PIXI from 'pixi.js';
 import { collidesWithPlatform } from './collisions';
+import { TileType } from '../level';
 
 describe('Collisions', () => {
   describe('character collisions with platform', () => {
@@ -11,6 +12,8 @@ describe('Collisions', () => {
         height: 20,
       };
       const tile = {
+        uid: 'test',
+        type: TileType.Platform,
         tileWidth: 16,
         tileHeight: 16,
         tileId: 100,
@@ -26,7 +29,7 @@ describe('Collisions', () => {
       testTileSprite.y = 0;
       const platform = [{ sprite: testTileSprite, tile }];
 
-      expect(collidesWithPlatform(testBox, platform, 4)).toEqual({
+      expect(collidesWithPlatform(testBox, platform, 4, 4)).toEqual({
         h: -1,
         v: 0,
       });

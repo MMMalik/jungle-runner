@@ -1,6 +1,15 @@
 import * as PIXI from 'pixi.js';
 import { render } from './State';
 import initState from '../../state';
+import { TileType } from './level';
+
+jest.mock('../../assets/levels/level1.json', () => ({
+  layers: [0, 0, 0],
+  height: 200,
+  width: 200,
+  tileheight: 20,
+  tilewidth: 20,
+}));
 
 describe('State', () => {
   let state = initState();
@@ -11,6 +20,8 @@ describe('State', () => {
 
   beforeEach(() => {
     const tile = {
+      type: TileType.Platform,
+      uid: 'test',
       tileWidth: 16,
       tileHeight: 16,
       tileId: 100,

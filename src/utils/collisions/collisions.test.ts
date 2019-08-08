@@ -177,18 +177,18 @@ describe('collisions - utils', () => {
 
   it('detects upcoming vertical collision between two rects - returns penetration, bottom', () => {
     const rect1 = {
-      x: 5,
-      y: 0,
-      width: 4,
-      height: 10,
-    };
-    const rect2 = {
-      x: 5,
+      x: 0,
       y: 11,
       width: 4,
       height: 10,
     };
-    const resultH = willCollideY(rect1, rect2, 2);
-    expect(resultH).toEqual(-1);
+    const rect2 = {
+      x: 0,
+      y: 0,
+      width: 4,
+      height: 10,
+    };
+    const resultV = willCollideY(rect1, rect2, -2);
+    expect(resultV).toEqual(1);
   });
 });

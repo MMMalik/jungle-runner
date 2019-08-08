@@ -12,10 +12,11 @@ export const isJumping = (ticks: number) => ticks > 0;
 
 export const getJumpTicks = (
   shouldStartJump: boolean,
+  touchesCeiling: boolean,
   jumpTicks: number,
   maxJumpTicks: number
 ): number => {
-  if (shouldStartJump || (jumpTicks > 0 && jumpTicks <= maxJumpTicks)) {
+  if ((shouldStartJump && !touchesCeiling) || (jumpTicks > 0 && jumpTicks <= maxJumpTicks)) {
     return jumpTicks + 1;
   }
   return 0;

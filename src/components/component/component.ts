@@ -28,7 +28,7 @@ export interface ComponentCommonProps {
   container: PIXI.Container;
 }
 
-export type CreateComponent = <Props, E extends PIXI.Sprite, GameState>(
+export type CreateComponent = <Props, E extends PIXI.Sprite | PIXI.Text, GameState>(
   Component: GameComponent<Props, E, GameState>,
   props: Props,
   state: GameState

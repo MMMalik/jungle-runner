@@ -100,7 +100,6 @@ export const render = (
   );
 
   element.y += vY;
-  element.y -= jumping ? CharacterConst.BaseJumpHeight : 0;
   element.scale.x = Math.abs(element.scale.x) * direction;
 
   // If calculated textures and current sprite's textures are not equal, replace them.

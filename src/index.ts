@@ -6,6 +6,8 @@ import Background from './components/background';
 import Character from './components/character';
 import Platform from './components/platform';
 import State from './components/state';
+import Coins from './components/coins';
+import Score from './components/score/Score';
 
 /**
  * Initialize Pixi application.
@@ -61,7 +63,7 @@ const init = async () => {
     container,
   };
 
-  [Background, Platform, Character, State]
+  [State, Background, Platform, Character, Coins, Score]
     .map(Component => createComponent(Component, props, state))
     .filter(Boolean)
     .forEach(({ element, elements, render, debug }) => {

@@ -50,5 +50,11 @@ export const willCollideY = (
     y: rect1.y + vY,
   };
   const collideY = collide(adjustedYRect1, rect2);
-  return collideY ? rect2.y - (adjustedYRect1.y + adjustedYRect1.height) : 0;
+  if (collideY) {
+    return vY >= 0
+      ? rect2.y - (adjustedYRect1.y + adjustedYRect1.height)
+      : rect2.y + rect2.height - adjustedYRect1.y;
+  }
+  return 0;
+  // return collideY ? rect2.y - (adjustedYRect1.y + adjustedYRect1.height) : 0;
 };

@@ -1,11 +1,11 @@
 import * as PIXI from 'pixi.js';
 import { GameState } from '../../../state';
-import { PlatformTile } from '../../platform/Platform';
+import { PlatformTile, CoinTile } from '../level';
 import {
   willCollideH,
   willCollideY,
+  collide,
 } from '../../../utils/collisions/collisions';
-import { GameConst } from '../../../constants';
 
 interface CollisionBox {
   x: number;
@@ -16,7 +16,7 @@ interface CollisionBox {
 
 export const CHARACTER_COLLISION_RECT = {
   width: 25,
-  height: 50,
+  height: 45,
 };
 
 export const createCollisionBox = (box: CollisionBox) => {
@@ -28,10 +28,26 @@ export const createCollisionBox = (box: CollisionBox) => {
   };
 };
 
+export const collidesWithCoin = (
+  collisionBox: CollisionBox,
+  coins: Array<{ sprite: PIXI.Sprite; tile: CoinTile }>
+) => {
+  return coins.find(({ sprite, tile }) => {
+    const coinBox = {
+      x: sprite.x,
+      y: sprite.y,
+      width: tile.tileWidth,
+      height: tile.tileHeight,
+    };
+    return collide(collisionBox, coinBox);
+  });
+};
+
 export const collidesWithPlatform = (
   collisionBox: CollisionBox,
   platform: Array<{ sprite: PIXI.Sprite; tile: PlatformTile }>,
-  directedVx: number
+  directedVx: number,
+  directedVy: number
 ) => {
   return platform.reduce(
     (acc, { sprite, tile }) => {
@@ -45,8 +61,10 @@ export const collidesWithPlatform = (
         h:
           acc.h === 0 ? willCollideH(collisionBox, tileBox, directedVx) : acc.h,
         v:
-          acc.v === 0 && !tile.hasNeighborUp && acc.h === 0
-            ? willCollideY(collisionBox, tileBox, GameConst.Gravity)
+          acc.v === 0 &&
+          (!tile.hasNeighborUp || !tile.hasNeighborDown) &&
+          acc.h === 0
+            ? willCollideY(collisionBox, tileBox, directedVy)
             : acc.v,
       };
     },
@@ -60,11 +78,13 @@ export const collidesWithPlatform = (
 export const calculateCollisions = ({
   state,
   directedVx,
+  directedVy,
 }: {
   state: GameState;
   directedVx: number;
+  directedVy: number;
 }) => {
-  const { platform, character } = state.sprites;
+  const { platform, coins, character } = state.sprites;
   const characterCollisionBox = createCollisionBox({
     x: character.x,
     y: character.y,
@@ -75,8 +95,10 @@ export const calculateCollisions = ({
     characterCollisionsWithPlatform: collidesWithPlatform(
       characterCollisionBox,
       platform,
-      directedVx
+      directedVx,
+      directedVy
     ),
+    characterCollisionsWithCoin: collidesWithCoin(characterCollisionBox, coins),
   };
 };
 
