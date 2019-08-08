@@ -1,19 +1,16 @@
 import * as PIXI from 'pixi.js';
 import { PlatformTile } from '../components/platform/Platform';
+import { Directions, GameConst } from '../constants';
 
 export interface GameState {
   character: {
     vX: number;
+    vY: number;
     jumpTicks: number;
-    collisions: {
-      platformH: number;
-      platformV: number;
-    };
-  };
-  keyboard: {
-    Space: boolean;
-    ArrowRight: boolean;
-    ArrowLeft: boolean;
+    movingX: boolean;
+    jumping: boolean;
+    onTheGround: boolean;
+    direction: number;
   };
   sprites: {
     platform: Array<{ sprite: PIXI.Sprite; tile: PlatformTile }>;
@@ -24,16 +21,12 @@ export interface GameState {
 const initState = (): GameState => ({
   character: {
     vX: 0,
+    vY: GameConst.Gravity,
     jumpTicks: 0,
-    collisions: {
-      platformH: 0,
-      platformV: 0,
-    },
-  },
-  keyboard: {
-    Space: false,
-    ArrowRight: false,
-    ArrowLeft: false,
+    movingX: false,
+    jumping: false,
+    onTheGround: false,
+    direction: Directions.Right,
   },
   sprites: {
     platform: [],

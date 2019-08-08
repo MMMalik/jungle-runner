@@ -4,9 +4,8 @@ import initState from './state';
 import createComponent from './components/component';
 import Background from './components/background';
 import Character from './components/character';
-import Keyboard from './components/keyboard';
 import Platform from './components/platform';
-import Collisions from './components/collisions';
+import State from './components/state';
 
 /**
  * Initialize Pixi application.
@@ -62,7 +61,7 @@ const init = async () => {
     container,
   };
 
-  [Background, Character, Platform, Keyboard, Collisions]
+  [Background, Platform, Character, State]
     .map(Component => createComponent(Component, props, state))
     .filter(Boolean)
     .forEach(({ element, elements, render, debug }) => {

@@ -1,12 +1,7 @@
 import * as PIXI from 'pixi.js';
 import { GameComponent, ComponentCommonProps, Render } from '../component';
-import {
-  Textures,
-  GameConst,
-  CharacterConst,
-  Directions,
-} from '../../constants';
-import { runningDirection, isMovingX, isJumping, GameState } from '../../state';
+import { Textures, GameConst, CharacterConst } from '../../constants';
+import { GameState } from '../../state';
 import { debugSprite } from '../../utils/debug';
 
 // Map resource name to actual Pixi loader resource.
@@ -97,44 +92,16 @@ export const render = (
   element,
   state,
 }) => {
-  const { ArrowLeft, ArrowRight, Space } = state.keyboard;
-  const { jumpTicks, collisions } = state.character;
-  const onTheGround = collisions.platformV < 0;
-  const movingX = isMovingX(ArrowRight, ArrowLeft);
-  const jumping = isJumping(jumpTicks);
-  const direction = runningDirection(ArrowRight, ArrowLeft);
+  const { vY, onTheGround, movingX, jumping, direction } = state.character;
   const currentTextures = getCurrentTexture(resources)(
     movingX,
     jumping,
     !!onTheGround
   );
 
-  // If sprite is not on the ground, apply gravity.
-  if (onTheGround) {
-    element.y += GameConst.Gravity + collisions.platformV;
-  } else {
-    element.y += GameConst.Gravity;
-  }
-
-  // Apply vX based on direction.
-  state.character.vX =
-    direction * (CharacterConst.BaseVx + direction * collisions.platformH);
-
-  // Apply scale in order to flip character if it is moving along x axis.
-  element.scale.x = Math.abs(element.scale.x) * (direction || Directions.Right);
-
-  // If space is pressed and character is on the ground, initialize jump.
-  if (Space && onTheGround) {
-    state.character.jumpTicks = 1;
-  }
-
-  // If character is jumping, adjust sprite's y accordingly.
-  // Then, adjust jump ticks.
-  if (jumping) {
-    element.y -= CharacterConst.BaseJumpHeight;
-    state.character.jumpTicks =
-      jumpTicks > CharacterConst.MaxJumpTicks ? 0 : jumpTicks + 1;
-  }
+  element.y += vY;
+  element.y -= jumping ? CharacterConst.BaseJumpHeight : 0;
+  element.scale.x = Math.abs(element.scale.x) * direction;
 
   // If calculated textures and current sprite's textures are not equal, replace them.
   if (!areSameTextures(element.textures, currentTextures)) {
