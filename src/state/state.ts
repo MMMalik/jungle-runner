@@ -1,5 +1,5 @@
 import * as PIXI from 'pixi.js';
-import { PlatformTile } from '../components/platform/Platform';
+import { PlatformTile } from '../components/platform';
 import { Directions, GameConst } from '../constants';
 
 export interface GameState {
