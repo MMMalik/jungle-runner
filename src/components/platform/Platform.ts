@@ -1,23 +1,8 @@
 import * as PIXI from 'pixi.js';
 import { Textures } from '../../constants/Textures';
 import { TileType, PlatformTile } from '../state/level';
-import { JungleRunnerGameComponent, JungleRunnerRender } from '../../types';
-import { isCharacterPastTheMiddle } from '../../state';
-
-export const render: JungleRunnerRender<PIXI.Sprite> = ({
-  initProps,
-  state,
-  elements,
-}) => {
-  if (
-    state.character.vX > 0 &&
-    isCharacterPastTheMiddle(initProps.canvas, state.sprites.character)
-  ) {
-    elements.forEach(tile => {
-      tile.x = tile.x - state.character.vX;
-    });
-  }
-};
+import { JungleRunnerGameComponent } from '../../types';
+import { noop } from '../../framework';
 
 const Platform: JungleRunnerGameComponent<PIXI.Sprite> = (_, state) => {
   const resource = PIXI.Loader.shared.resources[Textures.Jungle];
@@ -34,13 +19,13 @@ const Platform: JungleRunnerGameComponent<PIXI.Sprite> = (_, state) => {
       return { sprite, tile };
     });
 
-  state.sprites.platform = tileSprites;
+  state.world.platform = tileSprites;
 
   const sprites = tileSprites.map(({ sprite }) => sprite);
 
   return {
     elements: sprites,
-    render,
+    render: noop,
   };
 };
 

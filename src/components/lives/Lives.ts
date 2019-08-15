@@ -41,6 +41,7 @@ const Lives: JungleRunnerGameComponent<PIXI.Sprite> = (_, state) => {
   return {
     render,
     elements: lives,
+    isFixed: true,
   };
 };
 

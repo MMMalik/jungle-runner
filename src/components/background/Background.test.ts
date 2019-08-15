@@ -13,6 +13,7 @@ describe('Background', () => {
   const initProps = {
     canvas: document.createElement('canvas'),
     container: new PIXI.Container(),
+    cameraUpdateFn: () => noop,
     nextStage: noop,
   };
 

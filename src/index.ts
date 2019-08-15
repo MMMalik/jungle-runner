@@ -1,5 +1,5 @@
 import './fonts/EquipmentPro.woff';
-import initState from './state';
+import initState, { GameState } from './state';
 import Background from './components/background';
 import Character from './components/character';
 import Platform from './components/platform';
@@ -12,12 +12,18 @@ import {
   loadFonts,
   initLevel,
   manageStages,
-  loadAssets,
+  CameraFollowFn,
 } from './framework';
 import FinalScreen from './components/final';
 import GameOver from './components/gameOver';
-import { JungleRunnerGameStages, Textures } from './constants';
+import { JungleRunnerGameStages } from './constants';
 import LoadScreen from './components/load';
+
+const cameraFollowFn: CameraFollowFn<GameState> = state => {
+  return child => {
+    child.x -= state.camera.vX;
+  };
+};
 
 const init = async (id: string) => {
   const canvas = document.getElementById(id) as HTMLCanvasElement | null;
@@ -32,19 +38,19 @@ const init = async (id: string) => {
   await loadFonts(['EquipmentPro']);
 
   const nextGameStage = manageStages<typeof JungleRunnerGameStages>({
-    LoadAssets: () => initLevel(app, state, canvas, [LoadScreen]),
+    LoadAssets: () =>
+      initLevel(app, state, canvas, [LoadScreen], cameraFollowFn),
     NextLevel: () =>
-      initLevel(app, state, canvas, [
-        State,
-        Background,
-        Platform,
-        Character,
-        Coins,
-        Score,
-        Lives,
-      ]),
-    GameOver: () => initLevel(app, state, canvas, [GameOver]),
-    FinalScreen: () => initLevel(app, state, canvas, [FinalScreen]),
+      initLevel(
+        app,
+        state,
+        canvas,
+        [State, Background, Character, Platform, Coins, Score, Lives],
+        cameraFollowFn
+      ),
+    GameOver: () => initLevel(app, state, canvas, [GameOver], cameraFollowFn),
+    FinalScreen: () =>
+      initLevel(app, state, canvas, [FinalScreen], cameraFollowFn),
   });
 
   nextGameStage(JungleRunnerGameStages.LoadAssets);

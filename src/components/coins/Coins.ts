@@ -1,16 +1,8 @@
 import * as PIXI from 'pixi.js';
 import { Textures } from '../../constants/Textures';
 import { TileType, CoinTile } from '../state/level';
-import { JungleRunnerRender, JungleRunnerGameComponent } from '../../types';
-
-export const render: JungleRunnerRender<PIXI.Sprite> = ({
-  state,
-  elements,
-}) => {
-  elements.forEach(tile => {
-    tile.x -= state.character.vX;
-  });
-};
+import { JungleRunnerGameComponent } from '../../types';
+import { noop } from '../../framework';
 
 const resources: { [key: number]: () => PIXI.LoaderResource } = {
   327: () => PIXI.Loader.shared.resources[Textures.CoinGold],
@@ -33,11 +25,11 @@ const Coins: JungleRunnerGameComponent<PIXI.Sprite> = (_, state) => {
     });
 
   const sprites = coins.map(({ sprite }) => sprite);
-  state.sprites.coins = coins;
+  state.world.coins = coins;
 
   return {
     elements: sprites,
-    render,
+    render: noop,
   };
 };
 

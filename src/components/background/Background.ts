@@ -3,11 +3,11 @@ import { Textures } from '../../constants';
 import { JungleRunnerRender, JungleRunnerGameComponent } from '../../types';
 
 export const assets = [
-  { asset: 'plx-10.png', vX: 0.25 },
-  { asset: 'plx-11.png', vX: 0.3 },
-  { asset: 'plx-12.png', vX: 0.35 },
-  { asset: 'plx-12.png', vX: 0.4 },
-  { asset: 'plx-14.png', vX: 0.45 },
+  { asset: 'plx-10.png', vX: 0 },
+  { asset: 'plx-11.png', vX: 1 },
+  { asset: 'plx-12.png', vX: 2 },
+  { asset: 'plx-12.png', vX: 3 },
+  { asset: 'plx-14.png', vX: 4 },
 ];
 
 const BackgroundWidth = 384;
@@ -18,7 +18,7 @@ export const render: JungleRunnerRender<PIXI.TilingSprite> = ({
   elements,
 }) => {
   elements.forEach((tile, i) => {
-    tile.tilePosition.x -= assets[i].vX * state.character.vX;
+    tile.tilePosition.x -= 0.02 * assets[i].vX * state.camera.vX;
   });
 };
 

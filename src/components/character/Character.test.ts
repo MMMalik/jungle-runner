@@ -35,6 +35,7 @@ describe('Character - render', () => {
       element.height = 500;
       return element;
     })(),
+    cameraUpdateFn: () => noop,
     nextStage: noop,
     container: new PIXI.Container(),
   };

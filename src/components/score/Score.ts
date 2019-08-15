@@ -21,6 +21,7 @@ const Score: JungleRunnerGameComponent<PIXI.Text> = (_, state) => {
   return {
     render,
     elements: [text],
+    isFixed: true,
   };
 };
 

@@ -17,6 +17,7 @@ describe('State', () => {
   const initProps = {
     canvas: document.createElement('canvas'),
     container: new PIXI.Container(),
+    cameraUpdateFn: () => noop,
     nextStage: noop,
   };
 
@@ -35,8 +36,8 @@ describe('State', () => {
       hasNeighborUp: false,
     };
     state = initState();
-    state.sprites.character = new PIXI.Sprite();
-    state.sprites.platform = [{ sprite: new PIXI.Sprite(), tile }];
+    state.world.character.sprite = new PIXI.Sprite();
+    state.world.platform = [{ sprite: new PIXI.Sprite(), tile }];
   });
 
   describe('render', () => {

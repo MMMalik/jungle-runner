@@ -7,6 +7,7 @@ import {
   CleanupFn,
 } from '../component';
 import { noop } from '../helpers';
+import { camera, CameraFollowFn } from '../world';
 
 type GameStages<T> = {
   [P in keyof T]: NextStageInit<T>;
@@ -18,17 +19,20 @@ type InitFn<T> = (n: NextStageFn<T>) => CleanupFn;
 
 type NextStageInit<T> = () => InitFn<T>;
 
+type Components<GameState, OwnGameStages> = Array<
+  GameComponent<
+    ComponentCommonProps<OwnGameStages>,
+    PIXI.DisplayObject,
+    GameState
+  >
+>;
+
 type InitLevel = <GameState, OwnGameStages>(
   app: PIXI.Application,
   state: GameState,
   canvas: HTMLCanvasElement,
-  components: Array<
-    GameComponent<
-      ComponentCommonProps<OwnGameStages>,
-      PIXI.DisplayObject,
-      GameState
-    >
-  >
+  components: Components<GameState, OwnGameStages>,
+  cameraFollowFn: CameraFollowFn<GameState>
 ) => InitFn<OwnGameStages>;
 
 export const manageStages = <K extends {}>(outcomes: GameStages<K>) => {
@@ -47,9 +51,10 @@ export const initLevel: InitLevel = (
   app,
   state,
   canvas,
-  components
+  components,
+  followFn
 ) => nextStage => {
-  const container = new PIXI.Container();
+  const { container, updateFn } = camera(followFn);
   app.stage.addChild(container);
 
   const props = {
@@ -58,7 +63,7 @@ export const initLevel: InitLevel = (
     nextStage,
   };
 
-  return initComponents(app, props, state, components);
+  return initComponents(app, props, state, components, updateFn);
 };
 
 export const initPixiApp = (canvas: HTMLCanvasElement): PIXI.Application => {
@@ -66,6 +71,7 @@ export const initPixiApp = (canvas: HTMLCanvasElement): PIXI.Application => {
     view: canvas,
     height: canvas.scrollHeight,
     width: canvas.scrollWidth,
+    antialias: true,
   };
   const app = new PIXI.Application(config);
   app.renderer.render(app.stage);

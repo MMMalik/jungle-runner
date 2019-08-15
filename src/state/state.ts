@@ -13,15 +13,23 @@ export interface MovableComponent {
   direction: number;
 }
 
+export interface Camera {
+  vX: number;
+}
+
 export type TiledSprite<T, S> = Array<{
   sprite: T;
   tile: S;
 }>;
 
-export interface GameSprites {
+export interface WorldObjects {
   platform: TiledSprite<PIXI.Sprite, PlatformTile>;
   coins: TiledSprite<PIXI.AnimatedSprite, CoinTile>;
-  character: PIXI.Sprite;
+  character: {
+    x: number;
+    y: number;
+    sprite: PIXI.Sprite;
+  };
 }
 
 export interface GameState {
@@ -33,8 +41,9 @@ export interface GameState {
       tiles: LevelTile[][];
     };
   };
+  camera: Camera;
   character: MovableComponent;
-  sprites: GameSprites;
+  world: WorldObjects;
 }
 
 const initState = (): GameState => ({
@@ -56,10 +65,17 @@ const initState = (): GameState => ({
     onTheGround: false,
     direction: Directions.Right,
   },
-  sprites: {
+  camera: {
+    vX: 0,
+  },
+  world: {
     platform: [],
     coins: [],
-    character: new PIXI.Sprite(),
+    character: {
+      x: 0,
+      y: 0,
+      sprite: new PIXI.Sprite(),
+    },
   },
 });
 

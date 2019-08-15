@@ -1,5 +1,5 @@
 import * as PIXI from 'pixi.js';
-import { GameState } from '../../../state';
+import { GameState, WorldObjects } from '../../../state';
 import { PlatformTile, CoinTile, Tile } from '../level';
 import { willCollideH, willCollideY, collide } from '../../../framework';
 
@@ -41,8 +41,8 @@ export const collidesWithCoin = (
 ) => {
   return coins.find(({ sprite, tile }) => {
     const coinBox = {
-      x: sprite.x,
-      y: sprite.y,
+      x: tile.x,
+      y: tile.y,
       width: tile.tileWidth,
       height: tile.tileHeight,
     };
@@ -57,10 +57,10 @@ export const collidesWithPlatform = (
   directedVy: number
 ) => {
   return platform.reduce(
-    (acc, { sprite, tile }) => {
+    (acc, { tile }) => {
       const tileBox = {
-        x: sprite.x,
-        y: sprite.y,
+        x: tile.x,
+        y: tile.y,
         width: tile.tileWidth,
         height: tile.tileHeight,
       };
@@ -83,15 +83,15 @@ export const collidesWithPlatform = (
 };
 
 export const calculateCharacterCollisions = ({
-  sprites,
+  world,
   directedVx,
   directedVy,
 }: {
-  sprites: GameState['sprites'];
+  world: WorldObjects;
   directedVx: number;
   directedVy: number;
 }): CharacterCollisions => {
-  const { platform, coins, character } = sprites;
+  const { platform, coins, character } = world;
   const characterCollisionBox = createCollisionBox({
     x: character.x,
     y: character.y,
@@ -101,11 +101,14 @@ export const calculateCharacterCollisions = ({
   return {
     characterCollisionsWithPlatform: collidesWithPlatform(
       characterCollisionBox,
-      platform,
+      platform.filter(
+        ({ tile }) =>
+          Math.abs(tile.x - characterCollisionBox.x) < 200 &&
+          Math.abs(tile.y - characterCollisionBox.y) < 200
+      ),
       directedVx,
       directedVy
     ),
     characterCollisionsWithCoin: collidesWithCoin(characterCollisionBox, coins),
   };
 };
-

@@ -61,7 +61,6 @@ export const isOnTheGround = (
 export const render: (
   resources: typeof Resources
 ) => JungleRunnerRender<PIXI.AnimatedSprite> = resources => ({
-  initProps,
   elements,
   state,
 }) => {
@@ -82,10 +81,9 @@ export const render: (
 
     element.y += vY;
     element.x =
-      vX < 0 ||
-      !isCharacterPastTheMiddle(initProps.canvas, state.sprites.character)
+      state.character.vX < 0
         ? element.x + vX
-        : element.x;
+        : element.x + (vX - state.camera.vX);
     element.scale.x = Math.abs(element.scale.x) * direction;
 
     if (!areSameTextures(element.textures, currentTextures)) {
@@ -116,11 +114,16 @@ const Character: JungleRunnerGameComponent<PIXI.AnimatedSprite> = (
     getTextures(Resources.Idle(), AnimationNames.Idle)
   );
   initCharacterSprite(canvas, sprite);
-  state.sprites.character = sprite;
+  state.world.character = {
+    x: sprite.x,
+    y: sprite.y,
+    sprite,
+  };
 
   return {
     elements: [sprite],
     render: render(Resources),
+    isFollowed: true,
   };
 };
 
