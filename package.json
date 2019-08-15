@@ -14,10 +14,12 @@
     "lint": "tslint -p tsconfig.json"
   },
   "dependencies": {
-    "pixi.js": "^5.0.4"
+    "pixi.js": "^5.0.4",
+    "on-change": "^1.6.2"
   },
   "devDependencies": {
     "@types/jest": "^24.0.15",
+    "@types/webfontloader": "^1.6.29",
     "prettier": "^1.17.0",
     "tslint": "^5.16.0",
     "ts-jest": "^24.0.2",
@@ -32,6 +34,8 @@
     "webpack-dev-server": "^3.3.1",
     "copy-webpack-plugin": "^5.0.3",
     "html-webpack-plugin": "^3.2.0",
+    "file-loader": "^4.2.0",
+    "webfontloader": "^1.6.28",
     "awesome-typescript-loader": "^5.2.1"
   },
   "husky": {

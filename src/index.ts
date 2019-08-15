@@ -1,100 +1,57 @@
-import * as PIXI from 'pixi.js';
-import { Textures } from './constants';
+import './fonts/EquipmentPro.woff';
 import initState from './state';
-import createComponent from './components/component';
 import Background from './components/background';
 import Character from './components/character';
 import Platform from './components/platform';
 import State from './components/state';
 import Coins from './components/coins';
-import Score from './components/score/Score';
+import Score from './components/score';
+import Lives from './components/lives';
+import {
+  initPixiApp,
+  loadFonts,
+  initLevel,
+  manageStages,
+  loadAssets,
+} from './framework';
+import FinalScreen from './components/final';
+import GameOver from './components/gameOver';
+import { JungleRunnerGameStages, Textures } from './constants';
+import LoadScreen from './components/load';
 
-/**
- * Initialize Pixi application.
- * @param canvas Canvas element to embed game into
- */
-const initPixiApp = (canvas: HTMLCanvasElement): PIXI.Application => {
-  const config = {
-    view: canvas,
-    height: canvas.scrollHeight,
-    width: canvas.scrollWidth,
-  };
-  const app = new PIXI.Application(config);
-  app.renderer.render(app.stage);
-
-  return app;
-};
-
-/**
- * Promisified Pixi loader.
- */
-const loadAssets = () => {
-  return new Promise(resolve => {
-    PIXI.Loader.shared.add(
-      Object.keys(Textures).map((key: keyof typeof Textures) => Textures[key])
-    );
-    PIXI.Loader.shared.load(resolve);
-  });
-};
-
-/**
- * Get canvas element, load assets, then initialize Pixi app.
- * Once the app is initialized, create game components.
- * Each sprite from game component will be added to the Pixi container.
- * Each render function will added to the shared ticker.
- */
-const init = async () => {
-  const canvas = document.getElementById('game') as HTMLCanvasElement | null;
+const init = async (id: string) => {
+  const canvas = document.getElementById(id) as HTMLCanvasElement | null;
 
   if (!canvas) {
-    return;
+    throw new Error(`No canvas with specified id ${id} found.`);
   }
 
-  await loadAssets();
-
   const app = initPixiApp(canvas);
-  const container = new PIXI.Container();
   const state = initState();
 
-  app.stage.addChild(container);
+  await loadFonts(['EquipmentPro']);
 
-  const props = {
-    canvas,
-    container,
+  const nextGameStage = manageStages<typeof JungleRunnerGameStages>({
+    LoadAssets: () => initLevel(app, state, canvas, [LoadScreen]),
+    NextLevel: () =>
+      initLevel(app, state, canvas, [
+        State,
+        Background,
+        Platform,
+        Character,
+        Coins,
+        Score,
+        Lives,
+      ]),
+    GameOver: () => initLevel(app, state, canvas, [GameOver]),
+    FinalScreen: () => initLevel(app, state, canvas, [FinalScreen]),
+  });
+
+  nextGameStage(JungleRunnerGameStages.LoadAssets);
+
+  return () => {
+    app.destroy();
   };
-
-  [State, Background, Platform, Character, Coins, Score]
-    .map(Component => createComponent(Component, props, state))
-    .filter(Boolean)
-    .forEach(({ element, elements, render, debug }) => {
-      if (element) {
-        container.addChild(element);
-      }
-
-      if (elements) {
-        elements.forEach(el => {
-          container.addChild(el);
-        });
-      }
-
-      if (debug) {
-        // app.ticker.add(debug(container));
-      }
-
-      const ticker = (delta: number) => {
-        if (render) {
-          render({
-            initProps: props,
-            state,
-            element: element || new PIXI.Sprite(),
-            elements: elements || [],
-            delta,
-          });
-        }
-      };
-
-      app.ticker.add(ticker);
-    });
 };
 
-init();
+init('game');

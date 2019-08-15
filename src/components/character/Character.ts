@@ -1,10 +1,8 @@
 import * as PIXI from 'pixi.js';
-import { GameComponent, ComponentCommonProps, Render } from '../component';
 import { Textures, GameConst, CharacterConst } from '../../constants';
-import { GameState } from '../../state';
-import { debugSprite } from '../../utils/debug';
+import { JungleRunnerRender, JungleRunnerGameComponent } from '../../types';
+import { isCharacterPastTheMiddle } from '../../state';
 
-// Map resource name to actual Pixi loader resource.
 const Resources = {
   Idle: () => PIXI.Loader.shared.resources[Textures.CharacterIdle],
   Running: () => PIXI.Loader.shared.resources[Textures.CharacterRunning],
@@ -12,7 +10,6 @@ const Resources = {
   Landing: () => PIXI.Loader.shared.resources[Textures.CharacterLanding],
 };
 
-// Map keys to actual animation names
 const AnimationNames = {
   Idle: 'idle',
   Running: 'run',
@@ -20,34 +17,15 @@ const AnimationNames = {
   Landing: 'landing',
 };
 
-/**
- * Get Pixi textures associated with the given resource and animation name.
- *
- * @param resource Pixi loader resource
- * @param name Pixi animation name
- */
 export const getTextures = (resource: PIXI.LoaderResource, name: string) => {
   return resource.spritesheet!.animations[name];
 };
 
-/**
- * Compare if textures are equal.
- *
- * @param textures1 Pixi textures to compare
- * @param textures2 Pixi textures to compare
- */
 export const areSameTextures = (
   textures1: PIXI.Texture[],
   textures2: PIXI.Texture[]
 ) => textures1 === textures2;
 
-/**
- * Returns current textures based on the character's state.
- *
- * @param movingX If character is moving on X axis
- * @param jumping If character is jumping
- * @param onTheGround If character is on the ground
- */
 export const getCurrentTexture = (resources: typeof Resources) => (
   movingX: boolean,
   jumping: boolean,
@@ -73,12 +51,6 @@ export const getInitPosition = (canvas: HTMLCanvasElement) => ({
   y: canvas.height / 2,
 });
 
-/**
- * Checks if character is on the ground.
- *
- * @param canvas Html canvas element
- * @param sprite Pixi sprite
- */
 export const isOnTheGround = (
   canvas: HTMLCanvasElement,
   sprite: PIXI.Sprite
@@ -86,27 +58,41 @@ export const isOnTheGround = (
   return sprite.y >= canvas.height / 2;
 };
 
-export const render = (
+export const render: (
   resources: typeof Resources
-): Render<GameState, { element: PIXI.AnimatedSprite }> => ({
-  element,
+) => JungleRunnerRender<PIXI.AnimatedSprite> = resources => ({
+  initProps,
+  elements,
   state,
 }) => {
-  const { vY, onTheGround, movingX, jumping, direction } = state.character;
-  const currentTextures = getCurrentTexture(resources)(
-    movingX,
-    jumping,
-    !!onTheGround
-  );
+  elements.forEach(element => {
+    const {
+      vY,
+      vX,
+      onTheGround,
+      movingX,
+      jumping,
+      direction,
+    } = state.character;
+    const currentTextures = getCurrentTexture(resources)(
+      movingX,
+      jumping,
+      !!onTheGround
+    );
 
-  element.y += vY;
-  element.scale.x = Math.abs(element.scale.x) * direction;
+    element.y += vY;
+    element.x =
+      vX < 0 ||
+      !isCharacterPastTheMiddle(initProps.canvas, state.sprites.character)
+        ? element.x + vX
+        : element.x;
+    element.scale.x = Math.abs(element.scale.x) * direction;
 
-  // If calculated textures and current sprite's textures are not equal, replace them.
-  if (!areSameTextures(element.textures, currentTextures)) {
-    element.textures = currentTextures;
-    element.play();
-  }
+    if (!areSameTextures(element.textures, currentTextures)) {
+      element.textures = currentTextures;
+      element.play();
+    }
+  });
 };
 
 export const initCharacterSprite = (
@@ -122,14 +108,10 @@ export const initCharacterSprite = (
   sprite.play();
 };
 
-/**
- * Game component for main character.
- */
-const Character: GameComponent<
-  ComponentCommonProps,
-  PIXI.AnimatedSprite,
-  GameState
-> = ({ canvas }, state) => {
+const Character: JungleRunnerGameComponent<PIXI.AnimatedSprite> = (
+  { canvas },
+  state
+) => {
   const sprite = new PIXI.AnimatedSprite(
     getTextures(Resources.Idle(), AnimationNames.Idle)
   );
@@ -137,8 +119,7 @@ const Character: GameComponent<
   state.sprites.character = sprite;
 
   return {
-    element: sprite,
-    debug: debugSprite([sprite]),
+    elements: [sprite],
     render: render(Resources),
   };
 };

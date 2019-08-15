@@ -1,80 +1,49 @@
 import * as PIXI from 'pixi.js';
-import level1 from '../../assets/levels/level1.json';
-import { GameComponent, ComponentCommonProps, Render } from '../component';
+import { GameState, isJumping } from '../../state';
 import {
-  GameState,
-  isJumping,
-  getJumpTicks,
-  shouldCharacterMoveX,
-  getCharacterRunningDirection,
-} from '../../state';
-import calculateCollisions from './collisions';
-import { CharacterConst, Directions, GameConst } from '../../constants';
-import getKeyboardState from './keyboard';
-import { createLevel } from './level';
+  calculateCharacterCollisions,
+  CharacterCollisions,
+} from './collisions';
+import {
+  CharacterConst,
+  GameConst,
+  JungleRunnerGameStages,
+} from '../../constants';
+import { JungleRunnerGameComponent, JungleRunnerRender } from '../../types';
+import { updateCharacterState, updateCoinsState } from './updates';
+import { updateGameScoreState } from './updates/score';
 
-const getCharacterState = (state: GameState) => {
-  const { Space, ArrowLeft, ArrowRight } = getKeyboardState();
-  const direction = getCharacterRunningDirection(ArrowRight, ArrowLeft);
-  const movingX = shouldCharacterMoveX(ArrowRight, ArrowLeft);
-  const { jumpTicks, score } = state.character;
-  const jumping = isJumping(jumpTicks);
-  const {
-    characterCollisionsWithPlatform,
-    characterCollisionsWithCoin,
-  } = calculateCollisions({
-    state,
-    directedVx: CharacterConst.BaseVx * direction,
-    directedVy: jumping
-      ? GameConst.Gravity - CharacterConst.BaseJumpHeight
-      : GameConst.Gravity,
-  });
-  const onTheGround = Math.abs(characterCollisionsWithPlatform.v) !== 0;
+export interface AllCollisions {
+  characterCollisions: CharacterCollisions;
+}
 
-  if (characterCollisionsWithCoin) {
-    characterCollisionsWithCoin.sprite.parent.removeChild(
-      characterCollisionsWithCoin.sprite
-    );
-    state.sprites.coins = state.sprites.coins.filter(
-      coin => coin.tile.uid !== characterCollisionsWithCoin.tile.uid
-    );
-  }
-
-  if (characterCollisionsWithPlatform.v > 0) {
-    state.character.jumpTicks = 0;
-  }
-
+export const getCollisions = ({
+  sprites,
+  character,
+}: GameState): AllCollisions => {
   return {
-    direction: direction || Directions.Right,
-    score: characterCollisionsWithCoin ? score + 1 : score,
-    vX: direction * CharacterConst.BaseVx + characterCollisionsWithPlatform.h,
-    vY: jumping
-      ? GameConst.Gravity +
-        characterCollisionsWithPlatform.v -
-        CharacterConst.BaseJumpHeight
-      : GameConst.Gravity + characterCollisionsWithPlatform.v,
-    movingX,
-    jumping,
-    onTheGround,
-    jumpTicks: getJumpTicks(
-      onTheGround && Space,
-      characterCollisionsWithPlatform.v > 0,
-      jumpTicks,
-      CharacterConst.MaxJumpTicks
-    ),
+    characterCollisions: calculateCharacterCollisions({
+      sprites,
+      directedVx: CharacterConst.BaseVx * character.direction,
+      directedVy: isJumping(character.jumpTicks)
+        ? GameConst.Gravity - CharacterConst.BaseJumpHeight
+        : GameConst.Gravity,
+    }),
   };
 };
 
-export const render: Render<GameState, {}> = ({ state }) => {
-  state.character = getCharacterState(state);
+export const render: JungleRunnerRender<PIXI.Sprite> = ({
+  state,
+  initProps,
+}) => {
+  const collisions = getCollisions(state);
+  state.game.score = updateGameScoreState(state, collisions);
+  state.sprites.coins = updateCoinsState(state, collisions);
+  state.character = updateCharacterState(state, collisions, initProps);
 };
 
-const State: GameComponent<ComponentCommonProps, PIXI.Sprite, GameState> = (
-  _,
-  state
-) => {
-  state.level = createLevel(level1);
-  return { render };
+const State: JungleRunnerGameComponent<PIXI.Sprite> = () => {
+  return { render, elements: [] };
 };
 
 export default State;

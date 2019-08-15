@@ -1,10 +1,7 @@
 import * as PIXI from 'pixi.js';
-import { Textures } from '../../constants/Textures';
-import { GameComponent, ComponentCommonProps, Render } from '../component';
-import { GameState } from '../../state';
+import { Textures } from '../../constants';
+import { JungleRunnerRender, JungleRunnerGameComponent } from '../../types';
 
-// Value of `asset` corresponds to respective layer names in background.json asset.
-// Values of vX correspond to relative velocity of each layer. The further the layer is placed, the slower it seems to move.
 export const assets = [
   { asset: 'plx-10.png', vX: 0.25 },
   { asset: 'plx-11.png', vX: 0.3 },
@@ -13,11 +10,10 @@ export const assets = [
   { asset: 'plx-14.png', vX: 0.45 },
 ];
 
-// Size of layer (px).
 const BackgroundWidth = 384;
 const BackgroundHeight = 216;
 
-export const render: Render<GameState, { elements: PIXI.TilingSprite[] }> = ({
+export const render: JungleRunnerRender<PIXI.TilingSprite> = ({
   state,
   elements,
 }) => {
@@ -26,15 +22,9 @@ export const render: Render<GameState, { elements: PIXI.TilingSprite[] }> = ({
   });
 };
 
-/**
- * Background component initializes parallax background.
- * The main character does not move, it is the background which gives a scrolling effect.
- */
-const Background: GameComponent<
-  ComponentCommonProps,
-  PIXI.TilingSprite,
-  GameState
-> = ({ canvas }) => {
+const Background: JungleRunnerGameComponent<PIXI.TilingSprite> = ({
+  canvas,
+}) => {
   const resource = PIXI.Loader.shared.resources[Textures.Background];
   const tiles = assets.map(
     ({ asset }) => new PIXI.TilingSprite(resource.textures![asset])

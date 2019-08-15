@@ -2,37 +2,60 @@ import * as PIXI from 'pixi.js';
 import { Directions, GameConst } from '../constants';
 import { LevelTile, PlatformTile, CoinTile } from '../components/state/level';
 
+export interface MovableComponent {
+  vX: number;
+  vY: number;
+  lives: number;
+  jumpTicks: number;
+  movingX: boolean;
+  jumping: boolean;
+  onTheGround: boolean;
+  direction: number;
+}
+
+export type TiledSprite<T, S> = Array<{
+  sprite: T;
+  tile: S;
+}>;
+
+export interface GameSprites {
+  platform: TiledSprite<PIXI.Sprite, PlatformTile>;
+  coins: TiledSprite<PIXI.AnimatedSprite, CoinTile>;
+  character: PIXI.Sprite;
+}
+
 export interface GameState {
-  character: {
-    vX: number;
-    vY: number;
+  game: {
     score: number;
-    jumpTicks: number;
-    movingX: boolean;
-    jumping: boolean;
-    onTheGround: boolean;
-    direction: number;
+    level: {
+      finished: boolean;
+      num: number;
+      tiles: LevelTile[][];
+    };
   };
-  level: LevelTile[][];
-  sprites: {
-    platform: Array<{ sprite: PIXI.Sprite; tile: PlatformTile }>;
-    coins: Array<{ sprite: PIXI.AnimatedSprite; tile: CoinTile }>;
-    character: PIXI.Sprite;
-  };
+  character: MovableComponent;
+  sprites: GameSprites;
 }
 
 const initState = (): GameState => ({
+  game: {
+    score: 0,
+    level: {
+      num: 0,
+      finished: false,
+      tiles: [],
+    },
+  },
   character: {
     vX: 0,
     vY: GameConst.Gravity,
-    score: 0,
+    lives: 3,
     jumpTicks: 0,
     movingX: false,
     jumping: false,
     onTheGround: false,
     direction: Directions.Right,
   },
-  level: [],
   sprites: {
     platform: [],
     coins: [],

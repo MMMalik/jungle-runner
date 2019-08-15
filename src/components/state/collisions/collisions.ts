@@ -1,17 +1,24 @@
 import * as PIXI from 'pixi.js';
 import { GameState } from '../../../state';
-import { PlatformTile, CoinTile } from '../level';
-import {
-  willCollideH,
-  willCollideY,
-  collide,
-} from '../../../utils/collisions/collisions';
+import { PlatformTile, CoinTile, Tile } from '../level';
+import { willCollideH, willCollideY, collide } from '../../../framework';
 
-interface CollisionBox {
+export interface CollisionBox {
   x: number;
   y: number;
   width: number;
   height: number;
+}
+
+export interface CharacterCollisions {
+  characterCollisionsWithPlatform: {
+    v: number;
+    h: number;
+  };
+  characterCollisionsWithCoin?: {
+    sprite: PIXI.Sprite;
+    tile: Tile;
+  };
 }
 
 export const CHARACTER_COLLISION_RECT = {
@@ -75,16 +82,16 @@ export const collidesWithPlatform = (
   );
 };
 
-export const calculateCollisions = ({
-  state,
+export const calculateCharacterCollisions = ({
+  sprites,
   directedVx,
   directedVy,
 }: {
-  state: GameState;
+  sprites: GameState['sprites'];
   directedVx: number;
   directedVy: number;
-}) => {
-  const { platform, coins, character } = state.sprites;
+}): CharacterCollisions => {
+  const { platform, coins, character } = sprites;
   const characterCollisionBox = createCollisionBox({
     x: character.x,
     y: character.y,
@@ -102,4 +109,3 @@ export const calculateCollisions = ({
   };
 };
 
-export default calculateCollisions;

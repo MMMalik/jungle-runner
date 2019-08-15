@@ -1,30 +1,28 @@
 import * as PIXI from 'pixi.js';
-import {
-  GameComponent,
-  ComponentCommonProps,
-  Render,
-} from '../component/index.js';
-import { GameState } from '../../state/state.js';
 import { Textures } from '../../constants/Textures';
-import { debugSprite } from '../../utils/debug';
 import { TileType, PlatformTile } from '../state/level';
+import { JungleRunnerGameComponent, JungleRunnerRender } from '../../types';
+import { isCharacterPastTheMiddle } from '../../state';
 
-export const render: Render<GameState, { elements: PIXI.Sprite[] }> = ({
+export const render: JungleRunnerRender<PIXI.Sprite> = ({
+  initProps,
   state,
   elements,
 }) => {
-  elements.forEach(tile => {
-    tile.x -= state.character.vX;
-  });
+  if (
+    state.character.vX > 0 &&
+    isCharacterPastTheMiddle(initProps.canvas, state.sprites.character)
+  ) {
+    elements.forEach(tile => {
+      tile.x = tile.x - state.character.vX;
+    });
+  }
 };
 
-const Platform: GameComponent<ComponentCommonProps, PIXI.Sprite, GameState> = (
-  _,
-  state
-) => {
+const Platform: JungleRunnerGameComponent<PIXI.Sprite> = (_, state) => {
   const resource = PIXI.Loader.shared.resources[Textures.Jungle];
 
-  const tileSprites = state.level
+  const tileSprites = state.game.level.tiles
     .reduce((acc, row) => row.concat(acc), [])
     .filter(tile => tile.type === TileType.Platform)
     .map((tile: PlatformTile) => {
@@ -42,7 +40,6 @@ const Platform: GameComponent<ComponentCommonProps, PIXI.Sprite, GameState> = (
 
   return {
     elements: sprites,
-    debug: debugSprite(sprites),
     render,
   };
 };

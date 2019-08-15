@@ -1,7 +1,7 @@
 import * as PIXI from 'pixi.js';
 import { render, initCharacterSprite, getInitPosition } from './Character';
 import initState from '../../state';
-import { CharacterConst, Directions, GameConst } from '../../constants';
+import { noop } from '../../framework';
 
 const mockResource = (name: string) => {
   // @ts-ignore
@@ -35,6 +35,7 @@ describe('Character - render', () => {
       element.height = 500;
       return element;
     })(),
+    nextStage: noop,
     container: new PIXI.Container(),
   };
   let state = initState();
@@ -53,7 +54,7 @@ describe('Character - render', () => {
         initProps,
         state,
         delta: 1,
-        element: sprite,
+        elements: [sprite],
       });
       expect(sprite.x).toEqual(initPos.x + state.character.vX);
       expect(sprite.y).toEqual(initPos.y + state.character.vY);

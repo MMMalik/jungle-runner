@@ -7,4 +7,5 @@ export const Textures = {
   Jungle: 'assets/platform/jungle_tileset.json',
   CoinGold: 'assets/coins/gold.json',
   CoinGreen: 'assets/coins/green.json',
+  Life: 'assets/various/life.json',
 };

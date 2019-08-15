@@ -1,6 +1,7 @@
 import * as PIXI from 'pixi.js';
 import { render } from './Coins';
 import initState from '../../state';
+import { noop } from '../../framework';
 
 describe('Coins', () => {
   let state = initState();
@@ -8,6 +9,7 @@ describe('Coins', () => {
   const initProps = {
     canvas: document.createElement('canvas'),
     container: new PIXI.Container(),
+    nextStage: noop,
   };
 
   beforeEach(() => {

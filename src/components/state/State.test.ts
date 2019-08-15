@@ -2,6 +2,7 @@ import * as PIXI from 'pixi.js';
 import { render } from './State';
 import initState from '../../state';
 import { TileType } from './level';
+import { noop } from '../../framework';
 
 jest.mock('../../assets/levels/level1.json', () => ({
   layers: [0, 0, 0],
@@ -16,6 +17,7 @@ describe('State', () => {
   const initProps = {
     canvas: document.createElement('canvas'),
     container: new PIXI.Container(),
+    nextStage: noop,
   };
 
   beforeEach(() => {
@@ -43,6 +45,7 @@ describe('State', () => {
         initProps,
         state,
         delta: 1,
+        elements: [],
       });
       expect(state.character.vX).toEqual(state.character.vX);
     });

@@ -1,6 +1,7 @@
 import * as PIXI from 'pixi.js';
 import { render, assets } from './Background';
 import initState from '../../state';
+import { noop } from '../../framework';
 
 const mockSprites = () =>
   assets.map(({ asset }) => new PIXI.TilingSprite(PIXI.Texture.from(asset)));
@@ -12,6 +13,7 @@ describe('Background', () => {
   const initProps = {
     canvas: document.createElement('canvas'),
     container: new PIXI.Container(),
+    nextStage: noop,
   };
 
   beforeEach(() => {

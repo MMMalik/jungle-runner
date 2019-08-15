@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "module": "es2015",
+    "module": "esNext",
     "target": "es5",
     "noImplicitAny": true,
     "allowSyntheticDefaultImports": true,

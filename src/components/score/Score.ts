@@ -1,20 +1,16 @@
 import * as PIXI from 'pixi.js';
-import { GameComponent, ComponentCommonProps, Render } from '../component';
-import { GameState } from '../../state';
+import { JungleRunnerRender, JungleRunnerGameComponent } from '../../types';
 
-export const render: Render<GameState, { element: PIXI.Text }> = ({
-  state,
-  element,
-}) => {
-  element.text = `Score: ${state.character.score}`;
+export const render: JungleRunnerRender<PIXI.Text> = ({ state, elements }) => {
+  elements.forEach(element => {
+    element.text = `Score: ${state.game.score}`;
+  });
 };
 
-const Score: GameComponent<ComponentCommonProps, PIXI.Text, GameState> = (
-  _,
-  state
-) => {
-  const text = new PIXI.Text(`Score: ${state.character.score}`, {
-    fill: '#fff',
+const Score: JungleRunnerGameComponent<PIXI.Text> = (_, state) => {
+  const text = new PIXI.Text(`Score: ${state.game.score}`, {
+    fontFamily: 'EquipmentPro',
+    fill: '#FFE919',
   });
 
   text.anchor.x = 0.5;
@@ -24,7 +20,7 @@ const Score: GameComponent<ComponentCommonProps, PIXI.Text, GameState> = (
 
   return {
     render,
-    element: text,
+    elements: [text],
   };
 };
 

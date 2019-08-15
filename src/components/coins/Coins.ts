@@ -1,10 +1,9 @@
 import * as PIXI from 'pixi.js';
 import { Textures } from '../../constants/Textures';
-import { GameComponent, ComponentCommonProps, Render } from '../component';
-import { GameState } from '../../state';
 import { TileType, CoinTile } from '../state/level';
+import { JungleRunnerRender, JungleRunnerGameComponent } from '../../types';
 
-export const render: Render<GameState, { elements: PIXI.Sprite[] }> = ({
+export const render: JungleRunnerRender<PIXI.Sprite> = ({
   state,
   elements,
 }) => {
@@ -18,11 +17,8 @@ const resources: { [key: number]: () => PIXI.LoaderResource } = {
   328: () => PIXI.Loader.shared.resources[Textures.CoinGreen],
 };
 
-const Coins: GameComponent<ComponentCommonProps, PIXI.Sprite, GameState> = (
-  _,
-  state
-) => {
-  const coins = state.level
+const Coins: JungleRunnerGameComponent<PIXI.Sprite> = (_, state) => {
+  const coins = state.game.level.tiles
     .reduce((acc, row) => row.concat(acc), [])
     .filter(tile => tile.type === TileType.Coin)
     .map((tile: CoinTile) => {

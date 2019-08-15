@@ -6,7 +6,9 @@ export interface KeyboardState {
   ArrowRight: boolean;
 }
 
-const getKeyboardState = (): () => KeyboardState => {
+type GetKeyboardState = () => () => KeyboardState;
+
+const getKeyboardState: GetKeyboardState = () => {
   const keyboard: KeyboardState = {
     Space: false,
     ArrowRight: false,

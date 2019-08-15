@@ -19,7 +19,9 @@ export const edgesTouchH = (rect1: CollisionRect, rect2: CollisionRect) => {
 };
 
 export const edgesTouchV = (rect1: CollisionRect, rect2: CollisionRect) => {
-  return rect1.y + rect1.height === rect2.y || rect2.y + rect2.height === rect1.y;
+  return (
+    rect1.y + rect1.height === rect2.y || rect2.y + rect2.height === rect1.y
+  );
 };
 
 export const willCollideH = (
@@ -56,5 +58,4 @@ export const willCollideY = (
       : rect2.y + rect2.height - adjustedYRect1.y;
   }
   return 0;
-  // return collideY ? rect2.y - (adjustedYRect1.y + adjustedYRect1.height) : 0;
 };
