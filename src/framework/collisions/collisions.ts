@@ -24,6 +24,52 @@ export const edgesTouchV = (rect1: CollisionRect, rect2: CollisionRect) => {
   );
 };
 
+export const willCollideDiag = (
+  rect1: CollisionRect,
+  rect2: CollisionRect,
+  vX: number,
+  vY: number
+) => {
+  const adjustedRect1 = {
+    ...rect1,
+    x: rect1.x + vX,
+    y: rect1.y + vY,
+  };
+
+  const NE = vX >= 0 && vY <= 0;
+  const NW = vX <= 0 && vY <= 0;
+  const SE = vX >= 0 && vY >= 0;
+  const SW = vX <= 0 && vY >= 0;
+
+  if (collide(adjustedRect1, rect2)) {
+    if (NE) {
+      return {
+        h: rect2.x - (adjustedRect1.x + adjustedRect1.width),
+        v: rect2.y + rect2.height - adjustedRect1.y,
+      };
+    } else if (NW) {
+      return {
+        h: rect2.x + rect2.width - adjustedRect1.x,
+        v: rect2.y + rect2.height - adjustedRect1.y,
+      };
+    } else if (SE) {
+      return {
+        h: rect2.x - (adjustedRect1.x + adjustedRect1.width),
+        v: rect2.y - (adjustedRect1.y + adjustedRect1.height),
+      };
+    } else if (SW) {
+      return {
+        h: rect2.x + rect2.width - adjustedRect1.x,
+        v: rect2.y - (adjustedRect1.y + adjustedRect1.height),
+      };
+    }
+  }
+  return {
+    h: 0,
+    v: 0,
+  };
+};
+
 export const willCollideH = (
   rect1: CollisionRect,
   rect2: CollisionRect,

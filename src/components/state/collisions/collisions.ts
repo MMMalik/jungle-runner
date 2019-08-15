@@ -1,7 +1,12 @@
 import * as PIXI from 'pixi.js';
-import { GameState, WorldObjects } from '../../../state';
+import { WorldObjects } from '../../../state';
 import { PlatformTile, CoinTile, Tile } from '../level';
-import { willCollideH, willCollideY, collide } from '../../../framework';
+import {
+  willCollideH,
+  willCollideY,
+  collide,
+  willCollideDiag,
+} from '../../../framework';
 
 export interface CollisionBox {
   x: number;
@@ -56,7 +61,7 @@ export const collidesWithPlatform = (
   directedVx: number,
   directedVy: number
 ) => {
-  return platform.reduce(
+  const c = platform.reduce(
     (acc, { tile }) => {
       const tileBox = {
         x: tile.x,
@@ -64,6 +69,10 @@ export const collidesWithPlatform = (
         width: tile.tileWidth,
         height: tile.tileHeight,
       };
+      const diag =
+        acc.diag.h || acc.diag.v
+          ? acc.diag
+          : willCollideDiag(collisionBox, tileBox, directedVx, directedVy);
       return {
         h:
           acc.h === 0 ? willCollideH(collisionBox, tileBox, directedVx) : acc.h,
@@ -73,13 +82,28 @@ export const collidesWithPlatform = (
           acc.h === 0
             ? willCollideY(collisionBox, tileBox, directedVy)
             : acc.v,
+        diag,
       };
     },
     {
       h: 0,
       v: 0,
+      diag: {
+        h: 0,
+        v: 0,
+      },
     }
   );
+  if (c.h || c.v) {
+    return {
+      h: c.h,
+      v: c.v,
+    };
+  }
+  return {
+    h: c.diag.h,
+    v: 0,
+  };
 };
 
 export const calculateCharacterCollisions = ({
