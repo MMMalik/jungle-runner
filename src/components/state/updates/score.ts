@@ -1,9 +1,9 @@
 import { GameState } from '../../../state';
-import { AllCollisions } from '../State';
+import { AllCollisions } from '../collisions';
 
 export const updateGameScoreState = (
   { game: { score } }: GameState,
-  { characterCollisions: { characterCollisionsWithCoin } }: AllCollisions
+  { characterCollisionsWithCoin }: AllCollisions
 ): number => {
   if (!characterCollisionsWithCoin) {
     return score;

@@ -1,6 +1,11 @@
 import * as PIXI from 'pixi.js';
 import { Directions, GameConst } from '../constants';
-import { LevelTile, PlatformTile, CoinTile } from '../components/state/level';
+import {
+  LevelTile,
+  PlatformTile,
+  CoinTile,
+  EnemyTile,
+} from '../components/state/level';
 
 export interface MovableComponent {
   vX: number;
@@ -15,16 +20,42 @@ export interface MovableComponent {
 
 export interface Camera {
   vX: number;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
 }
 
-export type TiledSprite<T, S> = Array<{
-  sprite: T;
-  tile: S;
-}>;
+export type TiledSprite<T, S, Own> = Array<
+  {
+    sprite: T;
+    tile: S;
+  } & Own
+>;
+
+export type Totems = TiledSprite<
+  PIXI.AnimatedSprite,
+  EnemyTile,
+  { vX: number }
+>;
+
+export type Water = TiledSprite<PIXI.Sprite, EnemyTile, {}>;
+
+export type Platform = TiledSprite<PIXI.Sprite, PlatformTile, {}>;
 
 export interface WorldObjects {
-  platform: TiledSprite<PIXI.Sprite, PlatformTile>;
-  coins: TiledSprite<PIXI.AnimatedSprite, CoinTile>;
+  size: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  };
+  platform: Platform;
+  coins: TiledSprite<PIXI.AnimatedSprite, CoinTile, {}>;
+  enemies: {
+    totems: Totems;
+  };
+  water: Water;
   character: {
     x: number;
     y: number;
@@ -38,7 +69,7 @@ export interface GameState {
     level: {
       finished: boolean;
       num: number;
-      tiles: LevelTile[][];
+      tiles: LevelTile[];
     };
   };
   camera: Camera;
@@ -46,11 +77,15 @@ export interface GameState {
   world: WorldObjects;
 }
 
-const initState = (): GameState => ({
+export interface InitState {
+  camera: Camera;
+}
+
+const initState = ({ camera }: InitState): GameState => ({
   game: {
     score: 0,
     level: {
-      num: 0,
+      num: 1,
       finished: false,
       tiles: [],
     },
@@ -65,12 +100,20 @@ const initState = (): GameState => ({
     onTheGround: false,
     direction: Directions.Right,
   },
-  camera: {
-    vX: 0,
-  },
+  camera,
   world: {
+    size: {
+      x: 0,
+      y: 0,
+      width: 0,
+      height: 0,
+    },
     platform: [],
     coins: [],
+    enemies: {
+      totems: [],
+    },
+    water: [],
     character: {
       x: 0,
       y: 0,

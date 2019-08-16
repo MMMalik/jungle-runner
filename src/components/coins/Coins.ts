@@ -11,7 +11,6 @@ const resources: { [key: number]: () => PIXI.LoaderResource } = {
 
 const Coins: JungleRunnerGameComponent<PIXI.Sprite> = (_, state) => {
   const coins = state.game.level.tiles
-    .reduce((acc, row) => row.concat(acc), [])
     .filter(tile => tile.type === TileType.Coin)
     .map((tile: CoinTile) => {
       const sprite = new PIXI.AnimatedSprite(

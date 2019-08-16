@@ -7,7 +7,15 @@ const mockSprites = () =>
   assets.map(({ asset }) => new PIXI.TilingSprite(PIXI.Texture.from(asset)));
 
 describe('Background', () => {
-  let state = initState();
+  let state = initState({
+    camera: {
+      vX: 0,
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+    },
+  });
   let sprites = mockSprites();
 
   const initProps = {
@@ -18,7 +26,15 @@ describe('Background', () => {
   };
 
   beforeEach(() => {
-    state = initState();
+    state = initState({
+      camera: {
+        vX: 0,
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 100,
+      },
+    });
     sprites = mockSprites();
   });
 

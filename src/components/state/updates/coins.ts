@@ -1,11 +1,11 @@
 import { GameState, TiledSprite } from '../../../state';
-import { AllCollisions } from '../State';
 import { CoinTile } from '../level';
+import { AllCollisions } from '../collisions';
 
 export const updateCoinsState = (
   { world }: GameState,
-  { characterCollisions: { characterCollisionsWithCoin } }: AllCollisions
-): TiledSprite<PIXI.AnimatedSprite, CoinTile> => {
+  { characterCollisionsWithCoin }: AllCollisions
+): TiledSprite<PIXI.AnimatedSprite, CoinTile, {}> => {
   if (!characterCollisionsWithCoin) {
     return world.coins;
   }

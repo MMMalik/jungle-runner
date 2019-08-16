@@ -1,7 +1,7 @@
 import * as PIXI from 'pixi.js';
 import { Textures, GameConst, CharacterConst } from '../../constants';
 import { JungleRunnerRender, JungleRunnerGameComponent } from '../../types';
-import { isCharacterPastTheMiddle } from '../../state';
+import { CharacterTile, TileType } from '../state/level';
 
 const Resources = {
   Idle: () => PIXI.Loader.shared.resources[Textures.CharacterIdle],
@@ -94,26 +94,31 @@ export const render: (
 };
 
 export const initCharacterSprite = (
-  canvas: HTMLCanvasElement,
-  sprite: PIXI.AnimatedSprite
+  sprite: PIXI.AnimatedSprite,
+  startingTile?: CharacterTile
 ) => {
-  const { x, y } = getInitPosition(canvas);
   sprite.scale = new PIXI.Point(GameConst.ScaleX, GameConst.ScaleY);
   sprite.anchor = new PIXI.Point(0.5, 0.5);
   sprite.animationSpeed = CharacterConst.AnimationSpeed;
-  sprite.x = x;
-  sprite.y = y;
+  sprite.x = startingTile ? startingTile.x : 0;
+  sprite.y = startingTile ? startingTile.y : 0;
   sprite.play();
 };
 
 const Character: JungleRunnerGameComponent<PIXI.AnimatedSprite> = (
-  { canvas },
+  _,
   state
 ) => {
   const sprite = new PIXI.AnimatedSprite(
     getTextures(Resources.Idle(), AnimationNames.Idle)
   );
-  initCharacterSprite(canvas, sprite);
+
+  const startingTile = state.game.level.tiles.find(
+    (tile: CharacterTile) => tile.type === TileType.Character
+  );
+
+  initCharacterSprite(sprite, startingTile);
+  
   state.world.character = {
     x: sprite.x,
     y: sprite.y,

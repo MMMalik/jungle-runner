@@ -18,6 +18,8 @@ import FinalScreen from './components/final';
 import GameOver from './components/gameOver';
 import { JungleRunnerGameStages } from './constants';
 import LoadScreen from './components/load';
+import Enemies from './components/enemies';
+import Water from './components/water';
 
 const cameraFollowFn: CameraFollowFn<GameState> = state => {
   return child => {
@@ -33,7 +35,15 @@ const init = async (id: string) => {
   }
 
   const app = initPixiApp(canvas);
-  const state = initState();
+  const state = initState({
+    camera: {
+      vX: 0,
+      x: 0,
+      y: 0,
+      width: canvas.width,
+      height: canvas.height,
+    },
+  });
 
   await loadFonts(['EquipmentPro']);
 
@@ -45,7 +55,17 @@ const init = async (id: string) => {
         app,
         state,
         canvas,
-        [State, Background, Character, Platform, Coins, Score, Lives],
+        [
+          State,
+          Background,
+          Coins,
+          Character,
+          Enemies,
+          Platform,
+          Water,
+          Score,
+          Lives,
+        ],
         cameraFollowFn
       ),
     GameOver: () => initLevel(app, state, canvas, [GameOver], cameraFollowFn),

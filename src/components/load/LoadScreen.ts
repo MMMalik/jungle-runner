@@ -3,7 +3,7 @@ import { loadAssets, timeout, NextStageFn } from '../../framework';
 import { Textures, JungleRunnerGameStages } from '../../constants';
 import { JungleRunnerGameComponent, JungleRunnerRender } from '../../types';
 import { GameState } from '../../state';
-import { TileMap, createLevel } from '../state/level';
+import { TileMap, createLevel, initWorld } from '../state/level';
 
 const loadLevel = async (levelNum: number) => {
   return import(`../../assets/levels/level${levelNum}.json`);
@@ -13,12 +13,17 @@ const loadLevelAssets = (
   nextStage: NextStageFn<typeof JungleRunnerGameStages>,
   state: GameState
 ) => {
+  PIXI.Loader.shared.reset();
+  PIXI.utils.clearTextureCache();
   Promise.all([
     loadAssets(Textures),
     loadLevel(state.game.level.num),
     timeout(2000),
   ]).then(([_, tileMap]: [any, TileMap, any]) => {
-    state.game.level.tiles = createLevel(tileMap);
+    const { camera, size, tiles } = initWorld(tileMap);
+    state.camera = camera;
+    state.world.size = size;
+    state.game.level.tiles = tiles;
     nextStage(JungleRunnerGameStages.NextLevel);
   });
 };
@@ -26,9 +31,8 @@ const loadLevelAssets = (
 export const render = (): JungleRunnerRender<PIXI.Text> => {
   let i = 0;
   return ({ elements }) => {
-    elements.forEach(element => {
-      element.visible = Math.floor(i / 30) % 2 === 0;
-    });
+    const [_, loadingText] = elements;
+    loadingText.visible = Math.floor(i / 30) % 2 === 0;
     i++;
   };
 };
@@ -37,22 +41,31 @@ const LoadScreen: JungleRunnerGameComponent<PIXI.Text> = (
   { canvas, nextStage },
   state
 ) => {
-  const text = new PIXI.Text(`Loading...`, {
+  const levelText = new PIXI.Text(`Level ${state.game.level.num}\n\n\n\n`, {
     fontFamily: 'EquipmentPro',
     fill: '#fff',
   });
 
-  text.anchor.x = 0.5;
-  text.anchor.y = 0.5;
-  text.position.x = canvas.width / 2;
-  text.position.y = canvas.height / 2;
+  const loadingText = new PIXI.Text(`Loading...`, {
+    fontFamily: 'EquipmentPro',
+    fill: '#fff',
+  });
 
-  state.game.level.num += 1;
+  levelText.anchor.x = 0.5;
+  levelText.anchor.y = 0.5;
+  levelText.position.x = canvas.width / 2;
+  levelText.position.y = canvas.height / 2;
+
+  loadingText.anchor.x = 0.5;
+  loadingText.anchor.y = 0.5;
+  loadingText.position.x = canvas.width / 2;
+  loadingText.position.y = canvas.height / 2;
+
   loadLevelAssets(nextStage, state);
 
   return {
     render: render(),
-    elements: [text],
+    elements: [levelText, loadingText],
   };
 };
 

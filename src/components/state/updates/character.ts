@@ -5,17 +5,15 @@ import {
   isJumping,
   isOnTheGround,
   getJumpTicks,
-  isOutsideCanvas,
+  isOutsideWorld,
   MovableComponent,
 } from '../../../state';
 import { CharacterConst, GameConst, Directions } from '../../../constants';
-import { AllCollisions } from '../State';
-import { JungleRunnerProps } from '../../../types';
+import { AllCollisions } from '../collisions';
 
 export const updateCharacterState = (
   { character, world }: GameState,
-  { characterCollisions: { characterCollisionsWithPlatform } }: AllCollisions,
-  { canvas }: JungleRunnerProps,
+  { characterCollisionsWithPlatform }: AllCollisions,
   keyboard: KeyboardState,
   direction: number,
   delta: number
@@ -39,9 +37,7 @@ export const updateCharacterState = (
     direction === Directions.Left &&
     world.character.sprite.x - world.character.sprite.width / 2 < 0;
 
-  const lives = isOutsideCanvas(canvas, world.character.sprite)
-    ? character.lives - 1
-    : character.lives;
+  const lives = isOutsideWorld(world) ? character.lives - 1 : character.lives;
 
   const vX = isRunningOutsideLeftEdge
     ? 0
@@ -56,8 +52,8 @@ export const updateCharacterState = (
   return {
     direction: direction || character.direction,
     lives,
-    vX: vX * delta,
-    vY: vY * delta,
+    vX,
+    vY,
     movingX,
     jumping,
     onTheGround,

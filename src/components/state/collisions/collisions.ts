@@ -1,12 +1,14 @@
 import * as PIXI from 'pixi.js';
-import { WorldObjects } from '../../../state';
-import { PlatformTile, CoinTile, Tile } from '../level';
+import { WorldObjects, Totems, Platform } from '../../../state';
+import { CoinTile, Tile, PlatformTile } from '../level';
 import {
   willCollideH,
   willCollideY,
   collide,
   willCollideDiag,
 } from '../../../framework';
+import { Enemies } from '../../../constants/Enemies';
+import { GameConst } from '../../../constants';
 
 export interface CollisionBox {
   x: number;
@@ -15,20 +17,39 @@ export interface CollisionBox {
   height: number;
 }
 
-export interface CharacterCollisions {
-  characterCollisionsWithPlatform: {
-    v: number;
-    h: number;
-  };
+export interface Collision {
+  v: number;
+  h: number;
+}
+
+export interface TotemCollisionWithPlatform extends Collision {
+  tile: PlatformTile;
+}
+
+export interface AllCollisions {
+  characterCollisionsWithPlatform: Collision;
   characterCollisionsWithCoin?: {
     sprite: PIXI.Sprite;
     tile: Tile;
   };
+  characterCollisionsWithEnemies: Collision[];
+  totemsCollisionsWithPlatform: TotemCollisionWithPlatform[][];
 }
 
 export const CHARACTER_COLLISION_RECT = {
   width: 25,
   height: 45,
+};
+
+const isWithinRange = (collisionBox: CollisionBox) => ({
+  tile,
+}: {
+  tile: Tile;
+}) => {
+  return (
+    Math.abs(tile.x - collisionBox.x) < 200 &&
+    Math.abs(tile.y - collisionBox.y) < 200
+  );
 };
 
 export const createCollisionBox = (box: CollisionBox) => {
@@ -44,7 +65,7 @@ export const collidesWithCoin = (
   collisionBox: CollisionBox,
   coins: Array<{ sprite: PIXI.Sprite; tile: CoinTile }>
 ) => {
-  return coins.find(({ sprite, tile }) => {
+  return coins.find(({ tile }) => {
     const coinBox = {
       x: tile.x,
       y: tile.y,
@@ -55,9 +76,31 @@ export const collidesWithCoin = (
   });
 };
 
-export const collidesWithPlatform = (
+export const collidesWithTiles = <E extends Tile>(
   collisionBox: CollisionBox,
-  platform: Array<{ sprite: PIXI.Sprite; tile: PlatformTile }>,
+  tiles: Array<{ tile: E; sprite: PIXI.Sprite }>,
+  directedVx: number,
+  directedVy: number
+) => {
+  return tiles.filter(isWithinRange(collisionBox)).map(({ tile }) => {
+    const tileBox = {
+      x: tile.x,
+      y: tile.y,
+      width: tile.tileWidth,
+      height: tile.tileHeight,
+    };
+    return {
+      h: willCollideH(collisionBox, tileBox, directedVx),
+      v: willCollideY(collisionBox, tileBox, directedVy),
+      diag: willCollideDiag(collisionBox, tileBox, directedVx, directedVy),
+      tile,
+    };
+  });
+};
+
+export const collidesWithPlatformReduced = (
+  collisionBox: CollisionBox,
+  platform: Platform,
   directedVx: number,
   directedVy: number
 ) => {
@@ -106,7 +149,23 @@ export const collidesWithPlatform = (
   };
 };
 
-export const calculateCharacterCollisions = ({
+const totemsCollideWithPlatform = (totems: Totems, platform: Platform) => {
+  return totems.map(totem => {
+    return collidesWithTiles<PlatformTile>(
+      {
+        x: totem.tile.x,
+        y: totem.tile.y,
+        width: totem.tile.tileWidth,
+        height: totem.tile.tileHeight,
+      },
+      platform,
+      Enemies.Totems.vX * Math.round(totem.vX / Math.abs(totem.vX)),
+      GameConst.Gravity
+    ).filter(collision => collision.h || collision.v);
+  });
+};
+
+export const calculateCollisions = ({
   world,
   directedVx,
   directedVy,
@@ -114,8 +173,8 @@ export const calculateCharacterCollisions = ({
   world: WorldObjects;
   directedVx: number;
   directedVy: number;
-}): CharacterCollisions => {
-  const { platform, coins, character } = world;
+}): AllCollisions => {
+  const { platform, coins, character, enemies } = world;
   const characterCollisionBox = createCollisionBox({
     x: character.x,
     y: character.y,
@@ -123,16 +182,22 @@ export const calculateCharacterCollisions = ({
     height: CHARACTER_COLLISION_RECT.height,
   });
   return {
-    characterCollisionsWithPlatform: collidesWithPlatform(
+    characterCollisionsWithPlatform: collidesWithPlatformReduced(
       characterCollisionBox,
-      platform.filter(
-        ({ tile }) =>
-          Math.abs(tile.x - characterCollisionBox.x) < 200 &&
-          Math.abs(tile.y - characterCollisionBox.y) < 200
-      ),
+      platform.filter(isWithinRange(characterCollisionBox)),
+      directedVx,
+      directedVy
+    ),
+    characterCollisionsWithEnemies: collidesWithTiles(
+      characterCollisionBox,
+      enemies.totems,
       directedVx,
       directedVy
     ),
     characterCollisionsWithCoin: collidesWithCoin(characterCollisionBox, coins),
+    totemsCollisionsWithPlatform: totemsCollideWithPlatform(
+      enemies.totems,
+      platform
+    ),
   };
 };

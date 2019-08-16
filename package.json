@@ -14,8 +14,7 @@
     "lint": "tslint -p tsconfig.json"
   },
   "dependencies": {
-    "pixi.js": "^5.0.4",
-    "on-change": "^1.6.2"
+    "pixi.js": "^5.1.1"
   },
   "devDependencies": {
     "@types/jest": "^24.0.15",
@@ -46,7 +45,6 @@
   "lint-staged": {
     "*.ts": [
       "tslint -p tsconfig.json --fix",
-      "jest --findRelatedTests",
       "git add"
     ]
   }

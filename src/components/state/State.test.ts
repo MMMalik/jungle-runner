@@ -13,7 +13,15 @@ jest.mock('../../assets/levels/level1.json', () => ({
 }));
 
 describe('State', () => {
-  let state = initState();
+  let state = initState({
+    camera: {
+      vX: 0,
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+    },
+  });
   const initProps = {
     canvas: document.createElement('canvas'),
     container: new PIXI.Container(),
@@ -35,7 +43,15 @@ describe('State', () => {
       hasNeighborDown: true,
       hasNeighborUp: false,
     };
-    state = initState();
+    state = initState({
+      camera: {
+        vX: 0,
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 100,
+      },
+    });
     state.world.character.sprite = new PIXI.Sprite();
     state.world.platform = [{ sprite: new PIXI.Sprite(), tile }];
   });

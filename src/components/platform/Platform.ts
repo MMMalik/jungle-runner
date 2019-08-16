@@ -4,15 +4,27 @@ import { TileType, PlatformTile } from '../state/level';
 import { JungleRunnerGameComponent } from '../../types';
 import { noop } from '../../framework';
 
+const textures: { [key: number]: string } = {
+  1: Textures.Jungle,
+  2: Textures.Jungle,
+  3: Textures.Forest,
+};
+
+const levelTileNames: { [key: number]: (tileId: number) => string } = {
+  1: tileId => `jungle tileset${tileId - 1}.png`,
+  2: tileId => `jungle tileset${tileId - 1}.png`,
+  3: tileId => `forest_tileset${tileId - 407}.png`,
+};
+
 const Platform: JungleRunnerGameComponent<PIXI.Sprite> = (_, state) => {
-  const resource = PIXI.Loader.shared.resources[Textures.Jungle];
+  const levelNum = state.game.level.num;
+  const resource = PIXI.Loader.shared.resources[textures[levelNum]];
 
   const tileSprites = state.game.level.tiles
-    .reduce((acc, row) => row.concat(acc), [])
     .filter(tile => tile.type === TileType.Platform)
     .map((tile: PlatformTile) => {
       const sprite = new PIXI.Sprite(
-        resource.textures![`jungle tileset${tile.tileId - 1}.png`]
+        resource.textures![levelTileNames[levelNum]!(tile.tileId)]
       );
       sprite.x = tile.x;
       sprite.y = tile.y;

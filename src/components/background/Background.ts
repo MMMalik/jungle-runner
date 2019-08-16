@@ -1,5 +1,5 @@
 import * as PIXI from 'pixi.js';
-import { Textures } from '../../constants';
+import { Textures, GameConst } from '../../constants';
 import { JungleRunnerRender, JungleRunnerGameComponent } from '../../types';
 
 export const assets = [
@@ -22,19 +22,17 @@ export const render: JungleRunnerRender<PIXI.TilingSprite> = ({
   });
 };
 
-const Background: JungleRunnerGameComponent<PIXI.TilingSprite> = ({
-  canvas,
-}) => {
+const Background: JungleRunnerGameComponent<PIXI.TilingSprite> = (_, state) => {
   const resource = PIXI.Loader.shared.resources[Textures.Background];
   const tiles = assets.map(
     ({ asset }) => new PIXI.TilingSprite(resource.textures![asset])
   );
 
   tiles.forEach(tile => {
-    tile.scale.x = canvas.scrollWidth / BackgroundWidth;
-    tile.scale.y = canvas.scrollHeight / BackgroundHeight;
-    tile.height = canvas.scrollHeight;
-    tile.width = canvas.scrollWidth;
+    tile.scale.x = GameConst.Camera.width / BackgroundWidth;
+    tile.scale.y = GameConst.Camera.height / BackgroundHeight;
+    tile.height = state.world.size.height;
+    tile.width = state.world.size.width;
   });
 
   return {

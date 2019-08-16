@@ -1,4 +1,6 @@
 import { Directions } from '../constants';
+import { Coords } from '../framework';
+import { WorldObjects } from './state';
 
 export const getCharacterRunningDirection = (
   arrowRight: boolean,
@@ -18,10 +20,8 @@ export const isCharacterPastTheMiddle = (
   return x > canvas.width / 2;
 };
 
-export const isOutsideCanvas = (
-  canvas: HTMLCanvasElement,
-  sprite: PIXI.Sprite
-) => canvas.width < sprite.x || canvas.height < sprite.y;
+export const isOutsideWorld = (world: WorldObjects) =>
+  world.size.width < world.character.x || world.size.height < world.character.y;
 
 export const isOnTheGround = (verticalPenetration: number) =>
   Math.abs(verticalPenetration) !== 0;

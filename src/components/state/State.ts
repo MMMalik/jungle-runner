@@ -4,23 +4,21 @@ import {
   isJumping,
   getCharacterRunningDirection,
 } from '../../state';
+import { calculateCollisions, AllCollisions } from './collisions';
 import {
-  calculateCharacterCollisions,
-  CharacterCollisions,
-} from './collisions';
-import { CharacterConst, GameConst } from '../../constants';
+  CharacterConst,
+  GameConst,
+  JungleRunnerGameStages,
+} from '../../constants';
 import { JungleRunnerGameComponent, JungleRunnerRender } from '../../types';
 import {
   updateCharacterState,
   updateCoinsState,
   updateCameraState,
   updateGameScoreState,
+  updateTotems,
 } from './updates';
 import getKeyboardState from './keyboard';
-
-export interface AllCollisions {
-  characterCollisions: CharacterCollisions;
-}
 
 const predictedCharacterVx = ({ character }: GameState, direction: number) =>
   CharacterConst.BaseVx * direction;
@@ -32,15 +30,14 @@ const predictedCharacterVy = ({ character }: GameState) =>
 
 export const getCollisions = (
   state: GameState,
-  direction: number
+  direction: number,
+  delta: number
 ): AllCollisions => {
-  return {
-    characterCollisions: calculateCharacterCollisions({
-      world: state.world,
-      directedVx: predictedCharacterVx(state, direction),
-      directedVy: predictedCharacterVy(state),
-    }),
-  };
+  return calculateCollisions({
+    world: state.world,
+    directedVx: predictedCharacterVx(state, direction),
+    directedVy: predictedCharacterVy(state),
+  });
 };
 
 export const render: JungleRunnerRender<PIXI.Sprite> = ({
@@ -53,23 +50,39 @@ export const render: JungleRunnerRender<PIXI.Sprite> = ({
     keyboard.ArrowRight,
     keyboard.ArrowLeft
   );
-  const collisions = getCollisions(state, direction);
+  const collisions = getCollisions(state, direction, delta);
   state.game.score = updateGameScoreState(state, collisions);
   state.world.coins = updateCoinsState(state, collisions);
   state.character = updateCharacterState(
     state,
     collisions,
-    initProps,
     keyboard,
     direction,
     delta
   );
+  state.world.enemies.totems = updateTotems(state, collisions);
   state.camera = updateCameraState(state, initProps, direction);
   state.world.character = {
     ...state.world.character,
     x: state.world.character.x + state.character.vX,
     y: state.world.character.y + state.character.vY,
   };
+
+  if (state.world.character.x >= state.world.size.width) {
+    state.game.level.num += 1;
+    if (state.game.level.num > GameConst.Levels) {
+      initProps.nextStage(JungleRunnerGameStages.FinalScreen);
+    } else {
+      state.camera = {
+        vX: 0,
+        x: 0,
+        y: 0,
+        width: initProps.canvas.width,
+        height: initProps.canvas.height,
+      };
+      initProps.nextStage(JungleRunnerGameStages.LoadAssets);
+    }
+  }
 };
 
 const State: JungleRunnerGameComponent<PIXI.Sprite> = () => {
