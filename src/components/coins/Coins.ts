@@ -2,7 +2,7 @@ import * as PIXI from 'pixi.js';
 import { Textures } from '../../constants/Textures';
 import { TileType, CoinTile } from '../state/level';
 import { JungleRunnerGameComponent } from '../../types';
-import { noop } from '../../framework';
+import { noop, debugSprite } from '../../framework';
 
 const resources: { [key: number]: () => PIXI.LoaderResource } = {
   327: () => PIXI.Loader.shared.resources[Textures.CoinGold],

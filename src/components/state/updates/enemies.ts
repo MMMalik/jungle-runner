@@ -1,6 +1,7 @@
 import { GameState, Totems } from '../../../state';
 import { AllCollisions, TotemCollisionWithPlatform } from '../collisions';
 import { Enemies } from '../../../constants/Enemies';
+import { GameConst } from '../../../constants';
 
 const calculateNextVx = (
   currentVx: number,
@@ -33,6 +34,7 @@ export const updateTotems = (
     const collisions = totemsCollisionsWithPlatform[i];
 
     const hCollision = collisions.find(collision => collision.h !== 0);
+    const vCollision = collisions.find(collision => collision.v !== 0);
     const edgeTileLeft = collisions.find(
       collision =>
         collision.tile.hasNeighborRight && !collision.tile.hasNeighborLeft
@@ -43,14 +45,19 @@ export const updateTotems = (
     );
 
     const vX = calculateNextVx(t.vX, hCollision, edgeTileLeft, edgeTileRight);
+    const vY = vCollision
+      ? GameConst.Gravity + vCollision.v
+      : GameConst.Gravity;
 
     return {
       ...t,
       tile: {
         ...t.tile,
         x: t.tile.x + vX,
+        y: t.tile.y + vY,
       },
       vX,
+      vY,
     };
   });
 };

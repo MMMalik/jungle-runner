@@ -13,7 +13,10 @@ import { AllCollisions } from '../collisions';
 
 export const updateCharacterState = (
   { character, world }: GameState,
-  { characterCollisionsWithPlatform }: AllCollisions,
+  {
+    characterCollisionsWithPlatform,
+    characterCollisionsWithTotems,
+  }: AllCollisions,
   keyboard: KeyboardState,
   direction: number,
   delta: number
@@ -37,7 +40,10 @@ export const updateCharacterState = (
     direction === Directions.Left &&
     world.character.sprite.x - world.character.sprite.width / 2 < 0;
 
-  const lives = isOutsideWorld(world) ? character.lives - 1 : character.lives;
+  const lives =
+    isOutsideWorld(world) || characterCollisionsWithTotems
+      ? character.lives - 1
+      : character.lives;
 
   const vX = isRunningOutsideLeftEdge
     ? 0

@@ -13,6 +13,7 @@ import {
   initLevel,
   manageStages,
   CameraFollowFn,
+  noop,
 } from './framework';
 import FinalScreen from './components/final';
 import GameOver from './components/gameOver';
@@ -20,6 +21,7 @@ import { JungleRunnerGameStages } from './constants';
 import LoadScreen from './components/load';
 import Enemies from './components/enemies';
 import Water from './components/water';
+import PlainBackground from './components/plainBackground';
 
 const cameraFollowFn: CameraFollowFn<GameState> = state => {
   return child => {
@@ -49,9 +51,23 @@ const init = async (id: string) => {
 
   const nextGameStage = manageStages<typeof JungleRunnerGameStages>({
     LoadAssets: () =>
-      initLevel(app, state, canvas, [LoadScreen], cameraFollowFn),
-    NextLevel: () =>
       initLevel(
+        app,
+        state,
+        canvas,
+        [PlainBackground, LoadScreen],
+        cameraFollowFn
+      ),
+    NextLevel: () => {
+      state.camera = {
+        vX: 0,
+        x: 0,
+        y: 0,
+        width: canvas.width,
+        height: canvas.height,
+      };
+
+      return initLevel(
         app,
         state,
         canvas,
@@ -59,18 +75,20 @@ const init = async (id: string) => {
           State,
           Background,
           Coins,
+          Platform,
           Character,
           Enemies,
-          Platform,
           Water,
           Score,
           Lives,
         ],
         cameraFollowFn
-      ),
-    GameOver: () => initLevel(app, state, canvas, [GameOver], cameraFollowFn),
+      );
+    },
+    GameOver: () =>
+      initLevel(app, state, canvas, [PlainBackground, GameOver], () => noop),
     FinalScreen: () =>
-      initLevel(app, state, canvas, [FinalScreen], cameraFollowFn),
+      initLevel(app, state, canvas, [PlainBackground, FinalScreen], () => noop),
   });
 
   nextGameStage(JungleRunnerGameStages.LoadAssets);

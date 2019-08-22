@@ -32,13 +32,26 @@ export interface AllCollisions {
     sprite: PIXI.Sprite;
     tile: Tile;
   };
-  characterCollisionsWithEnemies: Collision[];
+  characterCollisionsWithTotems?: {
+    sprite: PIXI.Sprite;
+    tile: Tile;
+  };
   totemsCollisionsWithPlatform: TotemCollisionWithPlatform[][];
 }
 
 export const CHARACTER_COLLISION_RECT = {
   width: 25,
-  height: 45,
+  height: 42,
+};
+
+export const TOTEM_COLLISION_RECT = {
+  width: 22,
+  height: 20,
+};
+
+export const COIN_COLLISION_RECT = {
+  width: 10,
+  height: 28,
 };
 
 const isWithinRange = (collisionBox: CollisionBox) => ({
@@ -65,14 +78,29 @@ export const collidesWithCoin = (
   collisionBox: CollisionBox,
   coins: Array<{ sprite: PIXI.Sprite; tile: CoinTile }>
 ) => {
-  return coins.find(({ tile }) => {
+  return coins.find(coin => {
     const coinBox = {
-      x: tile.x,
-      y: tile.y,
-      width: tile.tileWidth,
-      height: tile.tileHeight,
+      x: coin.tile.x,
+      y: coin.tile.y,
+      width: COIN_COLLISION_RECT.width,
+      height: COIN_COLLISION_RECT.height,
     };
     return collide(collisionBox, coinBox);
+  });
+};
+
+export const collidesWithTotem = (
+  collisionBox: CollisionBox,
+  totems: Totems
+) => {
+  return totems.find(totem => {
+    const totemBox = createCollisionBox({
+      x: totem.tile.x,
+      y: totem.tile.y,
+      width: TOTEM_COLLISION_RECT.width,
+      height: TOTEM_COLLISION_RECT.height,
+    });
+    return collide(collisionBox, totemBox);
   });
 };
 
@@ -152,12 +180,12 @@ export const collidesWithPlatformReduced = (
 const totemsCollideWithPlatform = (totems: Totems, platform: Platform) => {
   return totems.map(totem => {
     return collidesWithTiles<PlatformTile>(
-      {
+      createCollisionBox({
         x: totem.tile.x,
         y: totem.tile.y,
-        width: totem.tile.tileWidth,
-        height: totem.tile.tileHeight,
-      },
+        width: TOTEM_COLLISION_RECT.width,
+        height: TOTEM_COLLISION_RECT.height,
+      }),
       platform,
       Enemies.Totems.vX * Math.round(totem.vX / Math.abs(totem.vX)),
       GameConst.Gravity
@@ -188,13 +216,11 @@ export const calculateCollisions = ({
       directedVx,
       directedVy
     ),
-    characterCollisionsWithEnemies: collidesWithTiles(
-      characterCollisionBox,
-      enemies.totems,
-      directedVx,
-      directedVy
-    ),
     characterCollisionsWithCoin: collidesWithCoin(characterCollisionBox, coins),
+    characterCollisionsWithTotems: collidesWithTotem(
+      characterCollisionBox,
+      enemies.totems
+    ),
     totemsCollisionsWithPlatform: totemsCollideWithPlatform(
       enemies.totems,
       platform

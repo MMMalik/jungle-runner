@@ -36,7 +36,7 @@ export type TiledSprite<T, S, Own> = Array<
 export type Totems = TiledSprite<
   PIXI.AnimatedSprite,
   EnemyTile,
-  { vX: number }
+  { vX: number; vY: number }
 >;
 
 export type Water = TiledSprite<PIXI.Sprite, EnemyTile, {}>;

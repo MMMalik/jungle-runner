@@ -83,12 +83,16 @@ export const initComponents: InitComponents = (
     };
   });
 
-  created.forEach(({ elements, isFixed, isFollowed }) => {
+  created.forEach(({ elements, debug, isFixed, isFollowed }) => {
     elements.forEach((el: ExtendedDisplayObject) => {
       el.__isFixed__ = isFixed;
       el.__isFollowed__ = isFollowed;
       props.container.addChild(el);
     });
+    if (debug) {
+      const fn = debug(props.container);
+      app.ticker.add(fn);
+    }
   });
 
   tickers.forEach(ticker => {

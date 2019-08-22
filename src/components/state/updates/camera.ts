@@ -8,7 +8,7 @@ export const updateCameraState = (
   direction: number
 ): Camera => {
   const characterMovesLeft = direction === Directions.Left;
-  const mapEnds = camera.x + camera.width >= world.size.width;
+  const mapEnds = camera.x + camera.width >= world.size.width - 2;
 
   if (characterMovesLeft || mapEnds) {
     return {
@@ -25,8 +25,7 @@ export const updateCameraState = (
     };
   }
 
-  const factor =
-    Math.round((world.character.sprite.x * 100) / (canvas.width / 1.8)) / 100;
+  const factor = (2 * world.character.sprite.x) / camera.width;
 
   return {
     ...camera,
