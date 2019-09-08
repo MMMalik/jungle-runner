@@ -4,7 +4,8 @@ import {
   LevelTile,
   PlatformTile,
   CoinTile,
-  EnemyTile,
+  TotemTile,
+  WaspTile,
 } from '../components/state/level';
 
 export interface MovableComponent {
@@ -35,11 +36,17 @@ export type TiledSprite<T, S, Own> = Array<
 
 export type Totems = TiledSprite<
   PIXI.AnimatedSprite,
-  EnemyTile,
+  TotemTile,
   { vX: number; vY: number }
 >;
 
-export type Water = TiledSprite<PIXI.Sprite, EnemyTile, {}>;
+export type Wasps = TiledSprite<
+  PIXI.AnimatedSprite,
+  WaspTile,
+  { vX: number; vY: number }
+>;
+
+export type Water = TiledSprite<PIXI.Sprite, TotemTile, {}>;
 
 export type Platform = TiledSprite<PIXI.Sprite, PlatformTile, {}>;
 
@@ -54,6 +61,7 @@ export interface WorldObjects {
   coins: TiledSprite<PIXI.AnimatedSprite, CoinTile, {}>;
   enemies: {
     totems: Totems;
+    wasps: Wasps;
   };
   water: Water;
   character: {
@@ -112,6 +120,7 @@ const initState = ({ camera }: InitState): GameState => ({
     coins: [],
     enemies: {
       totems: [],
+      wasps: [],
     },
     water: [],
     character: {

@@ -3,7 +3,7 @@ import { loadAssets, timeout, NextStageFn } from '../../framework';
 import { Textures, JungleRunnerGameStages } from '../../constants';
 import { JungleRunnerGameComponent, JungleRunnerRender } from '../../types';
 import { GameState } from '../../state';
-import { TileMap, createLevel, initWorld } from '../state/level';
+import { TileMap, initWorld } from '../state/level';
 
 const loadLevel = async (levelNum: number) => {
   return import(`../../assets/levels/level${levelNum}.json`);
@@ -20,7 +20,7 @@ const loadLevelAssets = (
     loadLevel(state.game.level.num),
     timeout(2000),
   ]).then(([_, tileMap]: [any, TileMap, any]) => {
-    const { camera, size, tiles } = initWorld(tileMap);
+    const { camera, size, tiles } = initWorld(tileMap, state.game.level.num);
     state.camera = camera;
     state.world.size = size;
     state.game.level.tiles = tiles;

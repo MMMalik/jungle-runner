@@ -17,6 +17,7 @@ import {
   updateCameraState,
   updateGameScoreState,
   updateTotems,
+  updateWasps,
 } from './updates';
 import getKeyboardState from './keyboard';
 
@@ -61,6 +62,7 @@ export const render: JungleRunnerRender<PIXI.Sprite> = ({
     delta
   );
   state.world.enemies.totems = updateTotems(state, collisions);
+  state.world.enemies.wasps = updateWasps(state, collisions);
   state.camera = updateCameraState(state, initProps, direction);
   state.world.character = {
     ...state.world.character,

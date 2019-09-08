@@ -11,7 +11,7 @@ const PlainBackground: JungleRunnerGameComponent<PIXI.Sprite> = ({
   bg.height = canvas.height;
   bg.x = 0;
   bg.y = 0;
-  bg.tint = 0x4a4f4a;
+  bg.tint = 0x182C3B;
 
   return {
     render: noop,

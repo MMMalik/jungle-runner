@@ -12,7 +12,8 @@ export enum TileType {
   Blank = 'Blank',
   Platform = 'Platform',
   Coin = 'Coin',
-  Enemy = 'Enemy',
+  Totem = 'Totem',
+  Wasp = 'Wasp',
   Character = 'Character',
   Water = 'Water',
 }
@@ -34,7 +35,9 @@ export interface PlatformTile extends Tile {
   hasNeighborUp: boolean;
 }
 
-export type EnemyTile = Tile;
+export type TotemTile = Tile;
+
+export type WaspTile = Tile;
 
 export type WaterTile = Tile;
 
@@ -42,29 +45,69 @@ export type CoinTile = Tile;
 
 export type CharacterTile = Tile;
 
-export type LevelTile = PlatformTile | CoinTile | CharacterTile | EnemyTile;
+export type LevelTile =
+  | PlatformTile
+  | CoinTile
+  | CharacterTile
+  | TotemTile
+  | WaspTile;
 
-export const tileIdToType: {
+export interface LevelDef {
+  [key: string]: TileType;
+}
+
+export interface LevelDefWithDefault extends LevelDef {
   default: TileType;
-  [key: number]: TileType;
-} = {
-  0: TileType.Blank,
-  326: TileType.Character,
-  327: TileType.Coin,
-  328: TileType.Coin,
-  331: TileType.Water,
-  332: TileType.Enemy,
-  default: TileType.Platform,
+}
+
+export const relativeCustomTileIdToType: LevelDef = {
+  0: TileType.Wasp,
+  1: TileType.Character,
+  2: TileType.Coin,
+  3: TileType.Coin,
+  6: TileType.Water,
+  7: TileType.Totem,
 };
 
-const hasPlatformNeightbour = (tileId: number) => {
+const levelCustomTileStart: { [key: string]: number } = {
+  1: 325,
+  2: 785,
+  3: 325,
+};
+
+const createLevelTileIdToTypeMap = (startNum: number): LevelDefWithDefault => {
+  return Object.keys(relativeCustomTileIdToType).reduce(
+    (acc, relativeNum) => {
+      return {
+        ...acc,
+        [startNum + parseInt(relativeNum, 10)]: relativeCustomTileIdToType[
+          relativeNum
+        ],
+      };
+    },
+    {
+      0: TileType.Blank,
+      default: TileType.Platform,
+    }
+  );
+};
+
+const hasPlatformNeightbour = (
+  tileId: number,
+  tileIdToType: LevelDefWithDefault
+) => {
   return !tileIdToType[tileId];
 };
 
-export const isCharacterTile = (tile: Tile) =>
-  tileIdToType[tile.tileId] === TileType.Character;
+export const isCharacterTile = (
+  tile: Tile,
+  tileIdToType: LevelDefWithDefault
+) => tileIdToType[tile.tileId] === TileType.Character;
 
-export const createLevel = (jsonLevelMap: TileMap): LevelTile[][] => {
+export const createLevel = (
+  jsonLevelMap: TileMap,
+  tileIdToType: LevelDefWithDefault
+): LevelTile[][] => {
   const array2d = Array.from({ length: jsonLevelMap.height }).map((_, i) =>
     jsonLevelMap.layers[0].data.slice(
       i * jsonLevelMap.width,
@@ -80,8 +123,8 @@ export const createLevel = (jsonLevelMap: TileMap): LevelTile[][] => {
       tileHeight: jsonLevelMap.tileheight,
       x: jsonLevelMap.tilewidth * j,
       y: jsonLevelMap.tileheight * i,
-      hasNeighborLeft: hasPlatformNeightbour(array2d[i][j - 1]),
-      hasNeighborRight: hasPlatformNeightbour(array2d[i][j + 1]),
+      hasNeighborLeft: hasPlatformNeightbour(array2d[i][j - 1], tileIdToType),
+      hasNeighborRight: hasPlatformNeightbour(array2d[i][j + 1], tileIdToType),
       hasNeighborDown:
         i >= 0 && i < array2d.length - 1 ? !!array2d[i + 1][j] : false,
       hasNeighborUp: i > 0 && i < array2d.length ? !!array2d[i - 1][j] : false,
@@ -89,10 +132,13 @@ export const createLevel = (jsonLevelMap: TileMap): LevelTile[][] => {
   });
 };
 
-export const initWorld = (tileMap: TileMap) => {
-  const tiles = createLevel(tileMap).reduce((acc, row) => row.concat(acc), []);
-
-  const characterTile = tiles.find(isCharacterTile);
+export const initWorld = (tileMap: TileMap, level: number) => {
+  const tileIdToType = createLevelTileIdToTypeMap(levelCustomTileStart[level]);
+  const tiles = createLevel(tileMap, tileIdToType).reduce(
+    (acc, row) => row.concat(acc),
+    []
+  );
+  const characterTile = tiles.find(tile => isCharacterTile(tile, tileIdToType));
 
   if (!characterTile) {
     throw new Error('Missing Character tile!');

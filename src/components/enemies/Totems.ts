@@ -1,14 +1,9 @@
 import * as PIXI from 'pixi.js';
-import { Textures } from '../../constants/Textures';
-import { TileType, EnemyTile } from '../state/level';
+import { TileType, TotemTile } from '../state/level';
 import { JungleRunnerGameComponent, JungleRunnerRender } from '../../types';
-import { Enemies } from '../../constants/Enemies';
-import { debugSprite } from '../../framework';
-import { GameConst } from '../../constants';
+import { GameConst, Textures, Enemies } from '../../constants';
 
-const resources: { [key: number]: () => PIXI.LoaderResource } = {
-  332: () => PIXI.Loader.shared.resources[Textures.Totem],
-};
+const texture = () => PIXI.Loader.shared.resources[Textures.Totem];
 
 export const render: JungleRunnerRender<PIXI.Sprite> = ({ state }) => {
   state.world.enemies.totems.forEach(({ sprite, vX, vY }) => {
@@ -20,10 +15,10 @@ export const render: JungleRunnerRender<PIXI.Sprite> = ({ state }) => {
 
 const Totems: JungleRunnerGameComponent<PIXI.Sprite> = (_, state) => {
   const totems = state.game.level.tiles
-    .filter(tile => tile.type === TileType.Enemy)
-    .map((tile: EnemyTile) => {
+    .filter(tile => tile.type === TileType.Totem)
+    .map((tile: TotemTile) => {
       const sprite = new PIXI.AnimatedSprite(
-        resources[tile.tileId]().spritesheet!.animations.walk
+        texture().spritesheet!.animations.walk
       );
       sprite.scale.x = 0.5;
       sprite.scale.y = 0.5;

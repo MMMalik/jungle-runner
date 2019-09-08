@@ -1,6 +1,7 @@
 export const Textures = {
   Background: 'assets/background/background.json',
   Totem: 'assets/enemies/totem_walk.json',
+  Wasp: 'assets/enemies/wasp.json',
   CharacterIdle: 'assets/character/idle.json',
   CharacterRunning: 'assets/character/run.json',
   CharacterJumping: 'assets/character/jump.json',

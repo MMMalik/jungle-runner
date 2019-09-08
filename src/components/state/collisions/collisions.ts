@@ -1,5 +1,5 @@
 import * as PIXI from 'pixi.js';
-import { WorldObjects, Totems, Platform } from '../../../state';
+import { WorldObjects, Totems, Platform, Wasps } from '../../../state';
 import { CoinTile, Tile, PlatformTile } from '../level';
 import {
   willCollideH,
@@ -22,7 +22,7 @@ export interface Collision {
   h: number;
 }
 
-export interface TotemCollisionWithPlatform extends Collision {
+export interface CollisionWithPlatform extends Collision {
   tile: PlatformTile;
 }
 
@@ -36,7 +36,8 @@ export interface AllCollisions {
     sprite: PIXI.Sprite;
     tile: Tile;
   };
-  totemsCollisionsWithPlatform: TotemCollisionWithPlatform[][];
+  totemsCollisionsWithPlatform: CollisionWithPlatform[][];
+  waspsCollisionsWithPlatform: CollisionWithPlatform[][];
 }
 
 export const CHARACTER_COLLISION_RECT = {
@@ -172,7 +173,7 @@ export const collidesWithPlatformReduced = (
     };
   }
   return {
-    h: c.diag.h,
+    h: 0,
     v: 0,
   };
 };
@@ -189,6 +190,22 @@ const totemsCollideWithPlatform = (totems: Totems, platform: Platform) => {
       platform,
       Enemies.Totems.vX * Math.round(totem.vX / Math.abs(totem.vX)),
       GameConst.Gravity
+    ).filter(collision => collision.h || collision.v);
+  });
+};
+
+const waspsCollideWithPlatform = (wasps: Wasps, platform: Platform) => {
+  return wasps.map(wasp => {
+    return collidesWithTiles<PlatformTile>(
+      createCollisionBox({
+        x: wasp.tile.x,
+        y: wasp.tile.y,
+        width: TOTEM_COLLISION_RECT.width,
+        height: TOTEM_COLLISION_RECT.height,
+      }),
+      platform,
+      Enemies.Totems.vX * Math.round(wasp.vX / Math.abs(wasp.vX)),
+      0
     ).filter(collision => collision.h || collision.v);
   });
 };
@@ -223,6 +240,10 @@ export const calculateCollisions = ({
     ),
     totemsCollisionsWithPlatform: totemsCollideWithPlatform(
       enemies.totems,
+      platform
+    ),
+    waspsCollisionsWithPlatform: totemsCollideWithPlatform(
+      enemies.wasps,
       platform
     ),
   };

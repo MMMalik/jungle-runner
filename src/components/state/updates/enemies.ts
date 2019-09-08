@@ -1,13 +1,13 @@
-import { GameState, Totems } from '../../../state';
-import { AllCollisions, TotemCollisionWithPlatform } from '../collisions';
+import { GameState, Totems, Wasps } from '../../../state';
+import { AllCollisions, CollisionWithPlatform } from '../collisions';
 import { Enemies } from '../../../constants/Enemies';
 import { GameConst } from '../../../constants';
 
 const calculateNextVx = (
   currentVx: number,
-  hCollision?: TotemCollisionWithPlatform,
-  edgeTileLeft?: TotemCollisionWithPlatform,
-  edgeTileRight?: TotemCollisionWithPlatform
+  hCollision?: CollisionWithPlatform,
+  edgeTileLeft?: CollisionWithPlatform,
+  edgeTileRight?: CollisionWithPlatform
 ) => {
   const unit = Math.round(currentVx / Math.abs(currentVx));
   if (hCollision) {
@@ -15,7 +15,6 @@ const calculateNextVx = (
       return -Enemies.Totems.vX * unit;
     }
     return currentVx + hCollision.h;
-    // return -Enemies.Totems.vX * Math.round(currentVx / Math.abs(currentVx));
   }
   if (edgeTileLeft) {
     return Enemies.Totems.vX;
@@ -58,6 +57,37 @@ export const updateTotems = (
       },
       vX,
       vY,
+    };
+  });
+};
+
+export const updateWasps = (
+  { world }: GameState,
+  { waspsCollisionsWithPlatform }: AllCollisions
+): Wasps => {
+  return world.enemies.wasps.map((t, i) => {
+    const collisions = waspsCollisionsWithPlatform[i];
+
+    const hCollision = collisions.find(collision => collision.h !== 0);
+    const edgeTileLeft = collisions.find(
+      collision =>
+        collision.tile.hasNeighborRight && !collision.tile.hasNeighborLeft
+    );
+    const edgeTileRight = collisions.find(
+      collision =>
+        collision.tile.hasNeighborLeft && !collision.tile.hasNeighborRight
+    );
+
+    const vX = calculateNextVx(t.vX, hCollision, edgeTileLeft, edgeTileRight);
+
+    return {
+      ...t,
+      tile: {
+        ...t.tile,
+        x: t.tile.x + vX,
+        y: t.tile.y,
+      },
+      vX,
     };
   });
 };

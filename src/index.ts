@@ -19,7 +19,7 @@ import FinalScreen from './components/final';
 import GameOver from './components/gameOver';
 import { JungleRunnerGameStages } from './constants';
 import LoadScreen from './components/load';
-import Enemies from './components/enemies';
+import { Totems, Wasps } from './components/enemies';
 import Water from './components/water';
 import PlainBackground from './components/plainBackground';
 
@@ -77,7 +77,8 @@ const init = async (id: string) => {
           Coins,
           Platform,
           Character,
-          Enemies,
+          Totems,
+          Wasps,
           Water,
           Score,
           Lives,
