@@ -173,7 +173,7 @@ export const collidesWithPlatformReduced = (
     };
   }
   return {
-    h: 0,
+    h: c.diag.h ? c.diag.h : 0,
     v: 0,
   };
 };

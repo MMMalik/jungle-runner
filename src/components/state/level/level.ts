@@ -71,8 +71,8 @@ export const relativeCustomTileIdToType: LevelDef = {
 
 const levelCustomTileStart: { [key: string]: number } = {
   1: 325,
-  2: 785,
-  3: 325,
+  2: 325,
+  3: 785,
 };
 
 const createLevelTileIdToTypeMap = (startNum: number): LevelDefWithDefault => {

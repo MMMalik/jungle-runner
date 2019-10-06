@@ -6,14 +6,14 @@ import { noop } from '../../framework';
 
 const textures: { [key: number]: string } = {
   1: Textures.Jungle,
-  2: Textures.Forest,
-  3: Textures.Jungle,
+  2: Textures.Jungle,
+  3: Textures.Forest,
 };
 
 const levelTileNames: { [key: number]: (tileId: number) => string } = {
   1: tileId => `jungle tileset${tileId - 1}.png`,
-  2: tileId => `forest_tileset${tileId - 1}.png`,
-  3: tileId => `jungle tileset${tileId - 1}.png`,
+  2: tileId => `jungle tileset${tileId - 1}.png`,
+  3: tileId => `forest_tileset${tileId - 1}.png`,
 };
 
 const Platform: JungleRunnerGameComponent<PIXI.Sprite> = (_, state) => {
